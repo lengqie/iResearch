@@ -5,7 +5,7 @@
  Source Server Type    : MySQL
  Source Server Version : 50726
  Source Host           : localhost:3306
- Source Schema         : ireseach
+ Source Schema         : iresearch
 
  Target Server Type    : MySQL
  Target Server Version : 50726

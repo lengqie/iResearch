@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 20/01/2022 18:36:38
+ Date: 20/01/2022 19:00:06
 */
 
 SET NAMES utf8mb4;
@@ -28,11 +28,21 @@ CREATE TABLE `college`  (
   `update_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of college
 -- ----------------------------
+INSERT INTO `college` VALUES (1, '数学与计算机科学学院', NULL, NULL);
+INSERT INTO `college` VALUES (2, '物理与电子信息学院', NULL, NULL);
+INSERT INTO `college` VALUES (3, '政治与法律学院', NULL, NULL);
+INSERT INTO `college` VALUES (4, '历史地理与旅游学院', NULL, NULL);
+INSERT INTO `college` VALUES (5, '外国语学院', NULL, NULL);
+INSERT INTO `college` VALUES (6, '化学与环境科学学院', NULL, NULL);
+INSERT INTO `college` VALUES (7, '教育科学学院', NULL, NULL);
+INSERT INTO `college` VALUES (8, '生命科学学院', NULL, NULL);
+INSERT INTO `college` VALUES (9, '文学与新闻传播学院', NULL, NULL);
+INSERT INTO `college` VALUES (10, '经济与管理学院', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for file
@@ -178,11 +188,13 @@ CREATE TABLE `project_type`  (
   `update_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `type`(`type`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of project_type
 -- ----------------------------
+INSERT INTO `project_type` VALUES (1, '研究', NULL, NULL);
+INSERT INTO `project_type` VALUES (2, '设计', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for subject
@@ -190,16 +202,23 @@ CREATE TABLE `project_type`  (
 DROP TABLE IF EXISTS `subject`;
 CREATE TABLE `subject`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `college_id` int(11) NULL DEFAULT NULL,
   `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `create_time` datetime NULL DEFAULT NULL,
   `update_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+  UNIQUE INDEX `name`(`name`) USING BTREE,
+  INDEX `college_id`(`college_id`) USING BTREE,
+  CONSTRAINT `subject_ibfk_1` FOREIGN KEY (`college_id`) REFERENCES `college` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of subject
 -- ----------------------------
+INSERT INTO `subject` VALUES (1, 1, '数学与应用数学', NULL, NULL);
+INSERT INTO `subject` VALUES (2, 1, '计算机科学与技术', NULL, NULL);
+INSERT INTO `subject` VALUES (3, 1, '	\r\n经济统计学', NULL, NULL);
+INSERT INTO `subject` VALUES (4, 1, '数据科学与大数据技术', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for user
@@ -217,11 +236,12 @@ CREATE TABLE `user`  (
   UNIQUE INDEX `name`(`name`) USING BTREE,
   INDEX `user_ibfk_1`(`user_type`) USING BTREE,
   CONSTRAINT `user_ibfk_1` FOREIGN KEY (`user_type`) REFERENCES `user_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
+INSERT INTO `user` VALUES (1, 'user', 'user', '测试用户', 1, '2022-01-20 18:47:01', '2022-01-20 18:47:03');
 
 -- ----------------------------
 -- Table structure for user_type
@@ -234,10 +254,12 @@ CREATE TABLE `user_type`  (
   `update_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `type`(`type`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_type
 -- ----------------------------
+INSERT INTO `user_type` VALUES (1, 'user', NULL, NULL);
+INSERT INTO `user_type` VALUES (2, 'admin', NULL, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

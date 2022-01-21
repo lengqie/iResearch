@@ -10,7 +10,6 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   jackson:
-    date-format: 'yyyy-MM-dd HH:mm:ss'
     time-zone: Asia/Shanghai
 
 

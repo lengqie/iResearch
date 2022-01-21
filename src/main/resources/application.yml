@@ -9,6 +9,15 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  jackson:
+    date-format: 'yyyy-MM-dd HH:mm:ss'
+    time-zone: Asia/Shanghai
+
 
 logging:
   config: classpath:logback-spring.xml
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

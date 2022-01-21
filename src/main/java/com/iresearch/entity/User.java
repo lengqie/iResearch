@@ -27,7 +27,7 @@ public class User implements Serializable {
 
     private String password;
 
-    private String nikename;
+    private String nickname;
 
     private Integer userType;
 
@@ -60,12 +60,12 @@ public class User implements Serializable {
           this.password = password;
       }
     
-    public String getNikename() {
-        return nikename;
+    public String getNickname() {
+        return nickname;
     }
 
-      public void setNikename(String nikename) {
-          this.nikename = nikename;
+      public void setNickname(String nickname) {
+          this.nickname = nickname;
       }
     
     public Integer getUserType() {
@@ -98,7 +98,7 @@ public class User implements Serializable {
               "id=" + id +
                   ", name=" + name +
                   ", password=" + password +
-                  ", nikename=" + nikename +
+                  ", nickname=" + nickname +
                   ", userType=" + userType +
                   ", createTime=" + createTime +
                   ", updateTime=" + updateTime +

@@ -1,8 +1,6 @@
 package com.iresearch.shiro.realm;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.iresearch.entity.User;
 import com.iresearch.entity.UserType;
 import com.iresearch.service.IUserService;
@@ -35,7 +33,7 @@ public class UserRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        logger.debug("Authorization...");
+        logger.info("Authorization...");
 
         final String username = (String) principalCollection.getPrimaryPrincipal();
 
@@ -53,25 +51,25 @@ public class UserRealm extends AuthorizingRealm {
         // HashSet匿名内部类
         info.setRoles(new HashSet<String>(){{add(type);}});
 
-        logger.debug("✔授权成功...");
+        logger.info("✔授权成功...");
         return info;
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        logger.debug("Authentication...");
+        logger.info("Authentication...");
         //
         final UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
         final String username = token.getUsername();
-        final String password = String.valueOf(token.getPassword());
+        final String password = new String(token.getPassword());
         final LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getName,username)
                 .eq(User::getPassword,password);
         final User user = iUserService.getOne(wrapper);
-        if (user != null){
-            throw new AuthenticationException("Account or password error\n");
+        if (user == null){
+            throw new AuthenticationException("account or password error\n");
         }
-        logger.debug("✔登录成功...");
+        logger.info("✔登录成功...");
         return new SimpleAuthenticationInfo(token.getPrincipal(),password,this.getName());
     }
 }

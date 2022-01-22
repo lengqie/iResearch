@@ -12,6 +12,11 @@ spring:
   jackson:
     time-zone: Asia/Shanghai
 
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+
 
 logging:
   config: classpath:logback-spring.xml

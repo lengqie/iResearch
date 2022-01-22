@@ -19,10 +19,10 @@ public class DruidConfig {
         ServletRegistrationBean<StatViewServlet> servletRegistrationBean = new ServletRegistrationBean<>(
                 new StatViewServlet(), "/druid/*");
         servletRegistrationBean.addInitParameter("allow", "127.0.0.1,10.1.1.1");
-        // servletRegistrationBean.addInitParameter("deny", "192.168.1.200"); // 黑名单
         servletRegistrationBean.addInitParameter("loginUsername", "admin");
         servletRegistrationBean.addInitParameter("loginPassword", "admin");
         servletRegistrationBean.addInitParameter("resetEnable", "false");
+
         return servletRegistrationBean ;
     }
 

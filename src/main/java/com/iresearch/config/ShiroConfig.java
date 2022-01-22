@@ -44,6 +44,8 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/swagger-ui/**","anon");
         filterChainDefinitionMap.put("/swagger-resources/**","anon");
         filterChainDefinitionMap.put("/v3/api-docs/**","anon");
+        //druid
+        filterChainDefinitionMap.put("/druid/**","anon");
 
         // 需要权限的url
         filterChainDefinitionMap.put("/admin/**", "authc");

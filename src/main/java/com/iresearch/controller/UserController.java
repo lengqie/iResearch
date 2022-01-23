@@ -3,16 +3,16 @@ package com.iresearch.controller;
 
 import com.iresearch.entity.User;
 import com.iresearch.service.IUserService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletResponse;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,8 +31,9 @@ public class UserController {
     IUserService iUserService;
 
     @GetMapping
-    public List<User> getUsers(){
+    public List<User> getUsers(HttpServletResponse response){
         final List<User> users = iUserService.list();
+        response.setStatus(HttpStatus.OK.value());
         return users;
     }
 
@@ -71,6 +72,23 @@ public class UserController {
         } else{
             response.setStatus(HttpStatus.OK.value());
         }
+    }
+
+    @PostMapping("/login")
+    public void login(String name,String password,
+                      HttpServletResponse response){
+
+        final Subject subject = SecurityUtils.getSubject();
+        subject.login(new UsernamePasswordToken(name,password));
+        response.setStatus(HttpStatus.OK.value());
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpServletResponse response){
+
+        final Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        response.setStatus(HttpStatus.OK.value());
     }
 
 }

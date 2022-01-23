@@ -7,9 +7,12 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author lengqie
@@ -24,15 +27,17 @@ public class CommonController {
     public User login(String name, String password){
 
         // 输入处理
-
         final Subject subject = SecurityUtils.getSubject();
         subject.login(new UsernamePasswordToken(name,password));
         return new User();
     }
-    @GetMapping("/admin")
-    @RequiresRoles({"user"})
-    public User admin(){
-        final Subject subject = SecurityUtils.getSubject();
-        return new User();
+
+    /**
+     * 没有权限
+     * @param response HttpServletResponse
+     */
+    @GetMapping("/401")
+    public void unauthorizedUrl(HttpServletResponse response){
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
     }
 }

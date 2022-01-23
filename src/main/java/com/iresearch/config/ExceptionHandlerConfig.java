@@ -1,5 +1,6 @@
 package com.iresearch.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @ControllerAdvice
 @RestController
+@Slf4j
 public class ExceptionHandlerConfig {
 
         /**
@@ -23,12 +25,14 @@ public class ExceptionHandlerConfig {
         @ExceptionHandler(value = {AuthenticationException.class, AuthorizationException.class})
         public String authenticationExceptionHandler(Exception e, HttpServletResponse response){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            log.info("" + e);
             return "👻 权限异常！";
         }
 
         @ExceptionHandler(value = Exception.class)
         public String exceptionHandler(Exception e, HttpServletResponse response){
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            log.info("" + e);
             return "👻 系统异常！";
         }
 }

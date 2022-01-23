@@ -1,16 +1,18 @@
 package com.iresearch.config;
 
 import com.iresearch.shiro.realm.UserRealm;
-import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -18,10 +20,17 @@ import java.util.Map;
 public class ShiroConfig {
 
     /**
-     * realm
+     * Realm
      * SecurityManager
      * ShiroFilterFactoryBean
+     * RedisSessionManager
      */
+
+    @Autowired(required = false)
+    RedisSessionDAO redisSessionDAO;
+
+    @Resource
+    RedisCacheManager redisCacheManager;
 
     @Bean
     public UserRealm userRealm(){
@@ -29,14 +38,14 @@ public class ShiroConfig {
     }
 
     @Bean
-    public DefaultWebSecurityManager securityManager() {
+    public DefaultWebSecurityManager securityManager(SessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(userRealm());
 
-        // 自定义缓存实现 使用redis
-        securityManager.setCacheManager(cacheManager());
-        // 自定义session管理 使用redis
-        securityManager.setSessionManager(sessionManager());
+        // inject sessionManager
+        securityManager.setSessionManager(sessionManager);
+        // inject redisCacheManager
+        securityManager.setCacheManager(redisCacheManager);
         return securityManager;
     }
 
@@ -65,32 +74,17 @@ public class ShiroConfig {
 
     }
 
-    public RedisManager redisManager() {
-        return new RedisManager();
-    }
-
-    public RedisCacheManager cacheManager() {
-        RedisCacheManager redisCacheManager = new RedisCacheManager();
-        redisCacheManager.setRedisManager(redisManager());
-        return redisCacheManager;
-    }
-
-    /**
-     * redisSessionDAO
-     */
-    public RedisSessionDAO redisSessionDAO() {
-        RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
-        redisSessionDAO.setRedisManager(redisManager());
-        return redisSessionDAO;
-    }
-
-    /**
-     * sessionManager
-     */
-    public DefaultWebSessionManager sessionManager() {
+    @Bean
+    public SessionManager sessionManager() {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
-        sessionManager.setSessionDAO(redisSessionDAO());
+
+        RedisManager redisManager = new RedisManager();
+        redisManager.setTimeout(100);
+
+        redisSessionDAO.setRedisManager(redisManager);
+        redisSessionDAO.setExpire(7200);
+
+        sessionManager.setSessionDAO(redisSessionDAO);
         return sessionManager;
     }
-
 }

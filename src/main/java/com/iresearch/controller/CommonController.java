@@ -4,6 +4,7 @@ import com.iresearch.entity.User;
 import com.iresearch.service.IUserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,12 @@ public class CommonController {
 
         final Subject subject = SecurityUtils.getSubject();
         subject.login(new UsernamePasswordToken(name,password));
+        return new User();
+    }
+    @GetMapping("/admin")
+    @RequiresRoles({"user"})
+    public User admin(){
+        final Subject subject = SecurityUtils.getSubject();
         return new User();
     }
 }

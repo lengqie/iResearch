@@ -43,9 +43,9 @@ public class ShiroConfig {
         securityManager.setRealm(userRealm());
 
         // inject sessionManager
-        securityManager.setSessionManager(sessionManager);
-        // inject redisCacheManager
-        securityManager.setCacheManager(redisCacheManager);
+        // securityManager.setSessionManager(sessionManager);
+        // // inject redisCacheManager
+        // securityManager.setCacheManager(redisCacheManager);
         return securityManager;
     }
 

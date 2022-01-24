@@ -13,4 +13,19 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserService extends IService<User> {
 
+
+    /**
+     * 通过用户名获取用户
+     * @param name
+     * @return
+     */
+
+    User getUserByName(String name);
+    /**
+     * 通过用户名 获取用户类型
+     * @param name
+     * @return
+     */
+    String getUserTypeStringByName(String name);
+
 }

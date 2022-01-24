@@ -1,6 +1,7 @@
 package com.iresearch.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.iresearch.constant.ProjectEnum;
 import com.iresearch.constant.RoleEnum;
 import com.iresearch.entity.Project;
 import com.iresearch.entity.User;
@@ -97,13 +98,13 @@ public class ProjectController {
      */
     @RequiresRoles({"user","admin"})
     @PostMapping
-    public void addProject(String name, int college, int subject,String inCharge, int type, int status,
+    public void addProject(String name, int college, int subject,String inCharge, int type,
                            String projectPurpose,String economicAnalysis, String existingConditions,
                            String expectedResult, String viableAnalysis,
                            HttpServletResponse response){
 
         Project project = new Project();
-        projectSetter(name, college, subject, inCharge, type, status, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
+        projectSetter(name, college, subject, inCharge, type, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
                 project);
         // 获取当前用户id
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
@@ -112,6 +113,7 @@ public class ProjectController {
 
         project.setCreateId(userId);
         project.setCreateTime(LocalDateTime.now());
+        project.setProjectStatus(0);
         // 保存到数据库
         final boolean save = iProjectService.save(project);
         if (save){
@@ -126,7 +128,7 @@ public class ProjectController {
      */
     @RequiresRoles({"user","admin"})
     @PutMapping("/{id}")
-    public void updateProjectById(@PathVariable String id, String name, int college, int subject,String inCharge, int type, int status,
+    public void updateProjectById(@PathVariable int id, String name, int college, int subject,String inCharge, int type,
                               String projectPurpose,String economicAnalysis, String existingConditions,
                                   String expectedResult, String viableAnalysis,
                               HttpServletResponse response) {
@@ -136,18 +138,17 @@ public class ProjectController {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-
         // 判断权限
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
-        final User user = iUserService.getUserByName(username);
         final String typeString = iUserService.getUserTypeStringByName(username);
-        // 当前角色是用户 且 项目创建者不是 当前用户
-        if (RoleEnum.USER.value().equals(typeString) && project.getCreateId().equals(user.getId())){
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        final boolean own = iProjectService.isOwnByUserName(id, username);
+        // 当前角色是用户 且 不是 项目创建者 无权修改
+        if (RoleEnum.USER.value().equals(typeString) && !own){
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
         }
         // 修改项目
-        projectSetter(name, college, subject, inCharge, type, status, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
+        projectSetter(name, college, subject, inCharge, type, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
                 project);
         project.setUpdateTime(LocalDateTime.now());
         // 保存数据库
@@ -160,20 +161,48 @@ public class ProjectController {
     }
 
     /**
-     * 修改项目状态
+     * 修改用户状态 管理员
+     * @param id
+     * @param status
      */
     @PutMapping("/{id}/status/{status}")
-    @RequiresRoles({"user","admin"})
-    public void  changeStatus(@PathVariable String id,@PathVariable Integer status,
+    @RequiresRoles({"admin"})
+    public void changeStatus(@PathVariable Integer id,@PathVariable Integer status,
                               HttpServletResponse response){
+
+        // 查找项目
         final Project project = iProjectService.getById(id);
-        // 判断  状态更改合法性
         if (project == null){
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        project.setSubjectId(status);
-        final boolean b = iProjectService.updateById(project);
+        // 判断权限
+        final String username = (String) SecurityUtils.getSubject().getPrincipal();
+        final String typeString = iUserService.getUserTypeStringByName(username);
+        final boolean own = iProjectService.isOwnByUserName(id, username);
+        // 当前角色是 用户 且 不是 创建者 无权修改
+        if (RoleEnum.USER.value().equals(typeString) && !own){
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return;
+        }
+        // 当前角色是 用户 且 是 创造者
+        else if (RoleEnum.USER.value().equals(typeString)){
+            // 提交合法性判断
+            // 只有两种情况可以 能够更改
+            final Integer projectStatus = project.getProjectStatus();
+            // 1. project 状态为 created 修改 为 applying
+            if (ProjectEnum.CREATED.value().equals(projectStatus) && ProjectEnum.APPLYING.value().equals(status)){
+            }
+            // 2. project 状态为 apply 修改 为 ending
+            else if (ProjectEnum.APPLY.value().equals(projectStatus) && ProjectEnum.ENDING.value().equals(status)){
+            }
+            else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return;
+            }
+        }
+        // 当前角色是 管理员 或 用户 合法时
+        final boolean b = iProjectService.updateProjectStatus(id, status);
         if (b){
             response.setStatus(HttpStatus.OK.value());
         } else {
@@ -181,24 +210,17 @@ public class ProjectController {
         }
     }
 
-    /**
-     * 简化代码
-     */
-    private void projectSetter(String name, int college, int subject, String inCharge, int type, int status, String projectPurpose, String economicAnalysis, String existingConditions, String expectedResult, String viableAnalysis, @NotNull Project project) {
+    // 简化代码
+    private void projectSetter(String name, int college, int subject, String inCharge, int type, String projectPurpose, String economicAnalysis, String existingConditions, String expectedResult, String viableAnalysis, @NotNull Project project) {
         project.setName(name);
         project.setCollegeId(college);
         project.setSubjectId(subject);
         project.setInCharge(inCharge);
         project.setProjectType(type);
-
-        project.setProjectStatus(status);
-
         project.setProjectPurpose(projectPurpose);
         project.setEconomicAnalysis(economicAnalysis);
         project.setExistingConditions(existingConditions);
         project.setExpectedResult(expectedResult);
         project.setViableAnalysis(viableAnalysis);
     }
-
 }
-

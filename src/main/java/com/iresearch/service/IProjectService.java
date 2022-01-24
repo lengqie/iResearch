@@ -13,4 +13,19 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IProjectService extends IService<Project> {
 
+    /**
+     * 修改用户状态
+     * @param id
+     * @param status
+     * @return
+     */
+    boolean updateProjectStatus(Integer id,Integer status);
+
+    /**
+     * 判断用户是否具有项目所有权
+     * @param id
+     * @param name
+     * @return
+     */
+    boolean isOwnByUserName(Integer id, String name);
 }

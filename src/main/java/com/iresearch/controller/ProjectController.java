@@ -7,6 +7,7 @@ import com.iresearch.entity.Project;
 import com.iresearch.entity.User;
 import com.iresearch.service.IProjectService;
 import com.iresearch.service.IUserService;
+import com.iresearch.vo.ProjectVO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -43,7 +44,7 @@ public class ProjectController {
      */
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @GetMapping
-    public List<Project> getProjects(HttpServletResponse response){
+    public List<ProjectVO> getProjects(HttpServletResponse response){
         // 权限判断
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
         final String userTypeString = iUserService.getUserTypeStringByName(username);
@@ -63,7 +64,7 @@ public class ProjectController {
             response.setStatus(HttpStatus.NOT_FOUND.value());
         } else {
             response.setStatus(HttpStatus.OK.value());
-            return projects;
+            return iProjectService.projectList2ProjectVOList(projects);
         }
         return null;
     }
@@ -75,7 +76,7 @@ public class ProjectController {
      */
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @GetMapping("/{id}")
-    public Project getProjectById( @PathVariable Integer id,HttpServletResponse response){
+    public ProjectVO getProjectById( @PathVariable Integer id,HttpServletResponse response){
         final Project project = iProjectService.getById(id);
         if (project == null){
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -91,7 +92,7 @@ public class ProjectController {
             return null;
         }
         response.setStatus(HttpStatus.OK.value());
-        return project;
+        return iProjectService.project2ProjectVO(project);
     }
 
     /**
@@ -99,7 +100,7 @@ public class ProjectController {
      */
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @GetMapping("/status/{status}")
-    public List<Project> getProjectsByStatus(@PathVariable Integer status,
+    public List<ProjectVO> getProjectsByStatus(@PathVariable Integer status,
                                              HttpServletResponse response){
 
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
@@ -120,7 +121,7 @@ public class ProjectController {
             response.setStatus(HttpStatus.NOT_FOUND.value());
         } else {
             response.setStatus(HttpStatus.OK.value());
-            return projects;
+            return iProjectService.projectList2ProjectVOList(projects);
         }
         return null;
     }

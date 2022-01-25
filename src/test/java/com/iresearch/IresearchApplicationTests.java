@@ -1,7 +1,9 @@
 package com.iresearch;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.iresearch.entity.File;
 import com.iresearch.entity.User;
+import com.iresearch.mapper.FileMapper;
 import com.iresearch.mapper.UserMapper;
 import com.iresearch.service.IUserService;
 import org.junit.jupiter.api.Test;
@@ -32,5 +34,14 @@ class IresearchApplicationTests {
         System.out.println(one);
 
     }
+
+    @Autowired
+    FileMapper fileMapper;
+
+    @Test
+    void file(){
+        System.out.println(fileMapper.selectById(0));
+    }
+
 
 }

@@ -1,15 +1,16 @@
 package com.iresearch.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.iresearch.entity.Project;
-import com.iresearch.entity.User;
-import com.iresearch.mapper.ProjectMapper;
-import com.iresearch.mapper.UserMapper;
+import com.iresearch.entity.*;
+import com.iresearch.mapper.*;
 import com.iresearch.service.IProjectService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.iresearch.vo.ProjectVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -28,6 +29,21 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Resource
     UserMapper userMapper;
 
+    @Resource
+    CollegeMapper collegeMapper;
+
+    @Resource
+    SubjectMapper subjectMapper;
+
+    @Resource
+    ProjectTypeMapper projectTypeMapper;
+
+    @Resource
+    ProjectStatusMapper projectStatusMapper;
+
+    @Resource
+    FileMapper fileMapper;
+
     @Override
     public boolean updateProjectStatus(Integer id, Integer status) {
         final Project project = projectMapper.selectById(id);
@@ -43,5 +59,48 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         wrapper.eq(User::getName,name);
         final User user = userMapper.selectOne(wrapper);
         return project.getCreateId().equals(user.getId());
+    }
+
+    @Override
+    public ProjectVO project2ProjectVO(Project project) {
+        ProjectVO projectVO = new ProjectVO();
+
+        projectVO.setId(project.getId());
+        projectVO.setName(project.getName());
+
+        final Integer collegeId = project.getCollegeId();
+        final College college = collegeMapper.selectById(collegeId);
+        projectVO.setCollegeName(college.getName());
+
+        final Integer subjectId = project.getSubjectId();
+        final Subject subject = subjectMapper.selectById(subjectId);
+        projectVO.setCollegeName(subject.getName());
+
+        projectVO.setInCharge(project.getInCharge());
+
+        final Integer projectType = project.getProjectType();
+        final ProjectType type = projectTypeMapper.selectById(projectType);
+        projectVO.setProjectTypeName(type.getType());
+
+        final Integer fileId = project.getFileId();
+        final File file = fileMapper.selectById(fileId);
+        projectVO.setFileName(file.getFile());
+
+        projectVO.setProjectPurpose(project.getProjectPurpose());
+        projectVO.setEconomicAnalysis(project.getEconomicAnalysis());
+        projectVO.setExistingConditions(project.getEconomicAnalysis());
+        projectVO.setExpectedResult(project.getExpectedResult());
+        projectVO.setViableAnalysis(project.getViableAnalysis());
+
+        return projectVO;
+    }
+
+    @Override
+    public List<ProjectVO> projectList2ProjectVOList(List<Project> projects) {
+        List<ProjectVO> projectVOList = new ArrayList<>();
+        for (Project project : projects) {
+            projectVOList.add(project2ProjectVO(project));
+        }
+        return projectVOList;
     }
 }

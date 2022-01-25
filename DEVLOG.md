@@ -1,8 +1,12 @@
 # 开发日志
 
-- 2022年1月23日  补充了 Shiro，添加了全局异常处理
+- 2022年1月25日  添加逻辑删除
 
-- 2022年1月22日  整合了 Shiro、Shiro-Redis
+- 2022年1月24日  自定义 userservice、projectservice，完善了业务逻辑 
+
+- 2022年1月23日  补充 Shiro，添加了全局异常处理
+
+- 2022年1月22日  整合 Shiro、Shiro-Redis
 
 - 2022年1月21日  整合Swagger、配置LogBack、一些默认的Controller、修复了日期格式问题
 

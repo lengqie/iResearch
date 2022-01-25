@@ -42,7 +42,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         final Integer typeId = user.getUserType();
         LambdaQueryWrapper<UserType> userTypeWrapper = new LambdaQueryWrapper<>();
-        userTypeWrapper.eq(UserType::getType,typeId);
+        userTypeWrapper.eq(UserType::getId,typeId);
         final UserType userType = userTypeMapper.selectOne(userTypeWrapper);
 
         return userType.getType();

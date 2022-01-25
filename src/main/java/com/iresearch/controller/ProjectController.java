@@ -3,8 +3,10 @@ package com.iresearch.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.iresearch.constant.ProjectEnum;
 import com.iresearch.constant.RoleEnum;
+import com.iresearch.entity.Operation;
 import com.iresearch.entity.Project;
 import com.iresearch.entity.User;
+import com.iresearch.service.IOperationService;
 import com.iresearch.service.IProjectService;
 import com.iresearch.service.IUserService;
 import com.iresearch.vo.ProjectVO;
@@ -37,6 +39,9 @@ public class ProjectController {
 
     @Autowired
     IUserService iUserService;
+
+    @Autowired
+    IOperationService iOperationService;
 
     /**
      * 获取全部项目
@@ -154,6 +159,12 @@ public class ProjectController {
         } else {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
+        // 操作记录
+        Operation operation =new Operation();
+        operation.setUserId(userId);
+        operation.setOperation(ProjectEnum.CREATED.explain());
+        operation.setCreateTime(LocalDateTime.now());
+        iOperationService.save(operation);
     }
 
     /**
@@ -180,6 +191,14 @@ public class ProjectController {
         // 删除
         iProjectService.removeById(id);
         response.setStatus(HttpStatus.OK.value());
+        // 操作记录
+        Operation operation =new Operation();
+        final User user = iUserService.getUserByName(username);
+        operation.setUserId(user.getId());
+        operation.setProjectId(id);
+        operation.setCreateTime(LocalDateTime.now());
+        operation.setOperation(ProjectEnum.DELETED.explain());
+        iOperationService.save(operation);
     }
 
     /**
@@ -217,6 +236,14 @@ public class ProjectController {
         } else {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
+        // 操作记录
+        Operation operation =new Operation();
+        final User user = iUserService.getUserByName(username);
+        operation.setUserId(user.getId());
+        operation.setProjectId(id);
+        operation.setCreateTime(LocalDateTime.now());
+        operation.setOperation(ProjectEnum.UPDATE.explain());
+        iOperationService.save(operation);
     }
 
     /**
@@ -226,10 +253,21 @@ public class ProjectController {
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     public void changeStatus(@PathVariable Integer id,@PathVariable Integer status,
                               HttpServletResponse response){
-
+        //合法性判断
         // 查找项目
         final Project project = iProjectService.getById(id);
         if (project == null){
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+        }
+        // 查找状态
+        ProjectEnum projectEnum = null;
+        for (ProjectEnum p : ProjectEnum.values()) {
+            if (p.value().equals(status)){
+                projectEnum = p;
+            }
+        }
+        if (projectEnum == null){
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
@@ -256,12 +294,20 @@ public class ProjectController {
             }
         }
         // 当前角色是 管理员 或 用户 合法时
-        final boolean b = iProjectService.updateProjectStatus(id, status);
-        if (b){
+        final boolean update = iProjectService.updateProjectStatus(id, status);
+        if (update){
             response.setStatus(HttpStatus.OK.value());
         } else {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
+        // 操作记录
+        Operation operation =new Operation();
+        final User user = iUserService.getUserByName(username);
+        operation.setUserId(user.getId());
+        operation.setProjectId(id);
+        operation.setOperation(projectEnum.explain());
+        operation.setCreateTime(LocalDateTime.now());
+        iOperationService.save(operation);
     }
 
     /**

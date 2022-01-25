@@ -16,6 +16,8 @@ public enum ProjectEnum {
     ENDING(3, "结课中"),
     END(4, "结课成功"),
     UNEND(-4, "结课失败"),
+
+    UPDATE(-3, "修改项目"),
     ;
 
     private final Integer value;

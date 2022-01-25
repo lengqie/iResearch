@@ -68,23 +68,33 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         projectVO.setId(project.getId());
         projectVO.setName(project.getName());
 
-        final Integer collegeId = project.getCollegeId();
-        final College college = collegeMapper.selectById(collegeId);
-        projectVO.setCollegeName(college.getName());
+        if (project.getCollegeId()!=null){
+            final Integer collegeId = project.getCollegeId();
+            final College college = collegeMapper.selectById(collegeId);
+            projectVO.setCollegeName(college.getName());
+        }
 
-        final Integer subjectId = project.getSubjectId();
-        final Subject subject = subjectMapper.selectById(subjectId);
-        projectVO.setCollegeName(subject.getName());
+        if (project.getSubjectId()!=null){
+            final Integer subjectId = project.getSubjectId();
+            final Subject subject = subjectMapper.selectById(subjectId);
+            projectVO.setSubjectName(subject.getName());
 
-        projectVO.setInCharge(project.getInCharge());
+        }
+        if (project.getInCharge()!=null){
+            projectVO.setInCharge(project.getInCharge());
+        }
 
-        final Integer projectType = project.getProjectType();
-        final ProjectType type = projectTypeMapper.selectById(projectType);
-        projectVO.setProjectTypeName(type.getType());
+        if (project.getProjectType()!=null){
+            final Integer projectType = project.getProjectType();
+            final ProjectType type = projectTypeMapper.selectById(projectType);
+            projectVO.setProjectTypeName(type.getType());
+        }
 
-        final Integer fileId = project.getFileId();
-        final File file = fileMapper.selectById(fileId);
-        projectVO.setFileName(file.getFile());
+        if (project.getFileId() != null){
+            final Integer fileId = project.getFileId();
+            final File file = fileMapper.selectById(fileId);
+            projectVO.setFileName(file.getFile());
+        }
 
         projectVO.setProjectPurpose(project.getProjectPurpose());
         projectVO.setEconomicAnalysis(project.getEconomicAnalysis());

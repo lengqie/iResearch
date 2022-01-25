@@ -1,6 +1,7 @@
 package com.iresearch;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.iresearch.constant.ProjectEnum;
 import com.iresearch.entity.File;
 import com.iresearch.entity.User;
 import com.iresearch.mapper.FileMapper;
@@ -43,5 +44,10 @@ class IresearchApplicationTests {
         System.out.println(fileMapper.selectById(0));
     }
 
-
+    @Test
+    void enumTest(){
+        for (ProjectEnum value : ProjectEnum.values()) {
+            System.out.println(value);
+        }
+    }
 }

@@ -8,6 +8,7 @@ import com.iresearch.entity.User;
 import com.iresearch.service.IProjectService;
 import com.iresearch.service.IUserService;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class ProjectController {
      * 获取全部项目
      * @param response response
      */
-    @RequiresRoles({"user","admin"})
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @GetMapping
     public List<Project> getProjects(HttpServletResponse response){
         // 权限判断
@@ -72,9 +73,9 @@ public class ProjectController {
      * @param  id ProjectId
      * @return Project
      */
-    @RequiresRoles({"user","admin"})
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @GetMapping("/{id}")
-    public Project getProjectById( @PathVariable String id,HttpServletResponse response){
+    public Project getProjectById( @PathVariable Integer id,HttpServletResponse response){
         final Project project = iProjectService.getById(id);
         if (project == null){
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -82,10 +83,10 @@ public class ProjectController {
         }
         // 判断权限
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
-        final User user = iUserService.getUserByName(username);
         final String typeString = iUserService.getUserTypeStringByName(username);
+        final boolean own = iProjectService.isOwnByUserName(id, username);
         // 当前角色是用户 且 项目创建者不是 当前用户
-        if (RoleEnum.USER.value().equals(typeString) && project.getCreateId().equals(user.getId())){
+        if (RoleEnum.USER.value().equals(typeString) && !own){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
         }
@@ -95,11 +96,10 @@ public class ProjectController {
 
     /**
      * 通过状态获取 项目
-     * @return
      */
-    @RequiresRoles({"user","admin"})
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @GetMapping("/status/{status}")
-    public List<Project> getProjectsByStatus(@PathVariable String status,
+    public List<Project> getProjectsByStatus(@PathVariable Integer status,
                                              HttpServletResponse response){
 
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
@@ -128,9 +128,9 @@ public class ProjectController {
     /**
      * 添加项目
      */
-    @RequiresRoles({"user","admin"})
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @PostMapping
-    public void addProject(String name, int college, int subject,String inCharge, int type,
+    public void addProject(String name, Integer college, Integer subject,String inCharge, Integer type,
                            String projectPurpose,String economicAnalysis, String existingConditions,
                            String expectedResult, String viableAnalysis,
                            HttpServletResponse response){
@@ -145,7 +145,7 @@ public class ProjectController {
 
         project.setCreateId(userId);
         project.setCreateTime(LocalDateTime.now());
-        project.setProjectStatus(0);
+        project.setProjectStatus(ProjectEnum.CREATED.value());
         // 保存到数据库
         final boolean save = iProjectService.save(project);
         if (save){
@@ -158,7 +158,7 @@ public class ProjectController {
     /**
      * 删除项目
      */
-    @RequiresRoles({"user","admin"})
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @DeleteMapping("/{id}")
     public void deleteProjectById(@PathVariable Integer id,
                                   HttpServletResponse response){
@@ -184,12 +184,13 @@ public class ProjectController {
     /**
      * 修改项目
      */
-    @RequiresRoles({"user","admin"})
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @PutMapping("/{id}")
-    public void updateProjectById(@PathVariable int id, String name, int college, int subject,String inCharge, int type,
-                              String projectPurpose,String economicAnalysis, String existingConditions,
+    public void updateProjectById(@PathVariable Integer id,
+                                  String name, Integer college, Integer subject,String inCharge, Integer type,
+                                  String projectPurpose,String economicAnalysis, String existingConditions,
                                   String expectedResult, String viableAnalysis,
-                              HttpServletResponse response) {
+                                  HttpServletResponse response){
         // 查找项目
         final Project project = iProjectService.getById(id);
         if (project == null){
@@ -219,11 +220,9 @@ public class ProjectController {
 
     /**
      * 修改用户状态
-     * @param id
-     * @param status
      */
     @PutMapping("/{id}/status/{status}")
-    @RequiresRoles({"admin"})
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     public void changeStatus(@PathVariable Integer id,@PathVariable Integer status,
                               HttpServletResponse response){
 
@@ -247,13 +246,11 @@ public class ProjectController {
             // 只有两种情况可以 能够更改
             final Integer projectStatus = project.getProjectStatus();
             // 1. project 状态为 created 修改 为 applying
-            if (ProjectEnum.CREATED.value().equals(projectStatus) && ProjectEnum.APPLYING.value().equals(status)){
-            }
+            final boolean case1 = ProjectEnum.CREATED.value().equals(projectStatus) && ProjectEnum.APPLYING.value().equals(status);
             // 2. project 状态为 apply 修改 为 ending
-            else if (ProjectEnum.APPLY.value().equals(projectStatus) && ProjectEnum.ENDING.value().equals(status)){
-            }
-            else {
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
+            final boolean case2 = ProjectEnum.APPLY.value().equals(projectStatus) && ProjectEnum.ENDING.value().equals(status);
+            if (!case1 || !case2){
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
         }
@@ -266,7 +263,9 @@ public class ProjectController {
         }
     }
 
-    // 简化代码
+    /**
+     * 简化代码
+     */
     private void projectSetter(String name, int college, int subject, String inCharge, int type, String projectPurpose, String economicAnalysis, String existingConditions, String expectedResult, String viableAnalysis, @NotNull Project project) {
         project.setName(name);
         project.setCollegeId(college);

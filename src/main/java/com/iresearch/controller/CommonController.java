@@ -24,9 +24,13 @@ public class CommonController {
     IUserService userService;
 
     @GetMapping("/login")
-    public User login(String name, String password){
-
+    public User login(String name, String password,
+                      HttpServletResponse response){
         // 输入处理
+        if (name == null || password == null){
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        }
         final Subject subject = SecurityUtils.getSubject();
         subject.login(new UsernamePasswordToken(name,password));
         return new User();
@@ -39,5 +43,12 @@ public class CommonController {
     @GetMapping("/401")
     public void unauthorizedUrl(HttpServletResponse response){
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    }
+    /**
+     * 没有权限
+     */
+    @GetMapping("/id/{id}")
+    public void test(@PathVariable int id){
+        System.out.println(id);
     }
 }

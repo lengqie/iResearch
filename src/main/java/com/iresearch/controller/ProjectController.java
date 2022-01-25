@@ -94,6 +94,38 @@ public class ProjectController {
     }
 
     /**
+     * 通过状态获取 项目
+     * @return
+     */
+    @RequiresRoles({"user","admin"})
+    @GetMapping("/status/{status}")
+    public List<Project> getProjectsByStatus(@PathVariable String status,
+                                             HttpServletResponse response){
+
+        final String username = (String) SecurityUtils.getSubject().getPrincipal();
+        final String userTypeString = iUserService.getUserTypeStringByName(username);
+
+        final List<Project> projects;
+        // 用户只能获取自己的 项目
+        LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Project::getProjectStatus,status);
+
+        if (RoleEnum.USER.value().equals(userTypeString)){
+            final User user = iUserService.getUserByName(username);
+            wrapper.eq(Project::getCreateId,user.getId());
+        }
+
+        projects = iProjectService.list(wrapper);
+        if(projects == null || projects.size() == 0){
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+        } else {
+            response.setStatus(HttpStatus.OK.value());
+            return projects;
+        }
+        return null;
+    }
+
+    /**
      * 添加项目
      */
     @RequiresRoles({"user","admin"})
@@ -124,6 +156,32 @@ public class ProjectController {
     }
 
     /**
+     * 删除项目
+     */
+    @RequiresRoles({"user","admin"})
+    @DeleteMapping("/{id}")
+    public void deleteProjectById(@PathVariable Integer id,
+                                  HttpServletResponse response){
+        // 查找项目
+        final Project project = iProjectService.getById(id);
+        if (project == null){
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+        }
+        // 判断权限
+        final String username = (String) SecurityUtils.getSubject().getPrincipal();
+        final String typeString = iUserService.getUserTypeStringByName(username);
+        // 当前角色是用户 且 不是 项目创建者 无权修改
+        if (RoleEnum.USER.value().equals(typeString) && !iProjectService.isOwnByUserName(id, username)){
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return;
+        }
+        // 删除
+        iProjectService.removeById(id);
+        response.setStatus(HttpStatus.OK.value());
+    }
+
+    /**
      * 修改项目
      */
     @RequiresRoles({"user","admin"})
@@ -141,9 +199,8 @@ public class ProjectController {
         // 判断权限
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
         final String typeString = iUserService.getUserTypeStringByName(username);
-        final boolean own = iProjectService.isOwnByUserName(id, username);
         // 当前角色是用户 且 不是 项目创建者 无权修改
-        if (RoleEnum.USER.value().equals(typeString) && !own){
+        if (RoleEnum.USER.value().equals(typeString) && !iProjectService.isOwnByUserName(id, username)){
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
         }
@@ -161,7 +218,7 @@ public class ProjectController {
     }
 
     /**
-     * 修改用户状态 管理员
+     * 修改用户状态
      * @param id
      * @param status
      */
@@ -179,9 +236,8 @@ public class ProjectController {
         // 判断权限
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
         final String typeString = iUserService.getUserTypeStringByName(username);
-        final boolean own = iProjectService.isOwnByUserName(id, username);
-        // 当前角色是 用户 且 不是 创建者 无权修改
-        if (RoleEnum.USER.value().equals(typeString) && !own){
+        // 当前角色是用户 且 不是 项目创建者 无权修改
+        if (RoleEnum.USER.value().equals(typeString) && !iProjectService.isOwnByUserName(id, username)){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
         }

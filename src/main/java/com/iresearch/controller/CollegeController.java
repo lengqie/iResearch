@@ -29,8 +29,7 @@ public class CollegeController {
 
     @GetMapping()
     public List<College> getColleges(){
-        final List<College> colleges = iCollegeService.list();
-        return colleges;
+        return iCollegeService.list();
     }
 }
 

@@ -25,13 +25,6 @@ const routes = [
                 },
                 component: () => import ( /* webpackChunkName: "table" */ "../views/BaseTable.vue")
             }, {
-                path: "/charts",
-                name: "basecharts",
-                meta: {
-                    title: '图表'
-                },
-                component: () => import ( /* webpackChunkName: "charts" */ "../views/BaseCharts.vue")
-            }, {
                 path: "/form",
                 name: "baseform",
                 meta: {
@@ -45,13 +38,6 @@ const routes = [
                     title: 'tab标签'
                 },
                 component: () => import ( /* webpackChunkName: "tabs" */ "../views/Tabs.vue")
-            }, {
-                path: "/donate",
-                name: "donate",
-                meta: {
-                    title: '鼓励作者'
-                },
-                component: () => import ( /* webpackChunkName: "donate" */ "../views/Donate.vue")
             }, {
                 path: "/permission",
                 name: "permission",
@@ -102,13 +88,6 @@ const routes = [
                     title: '个人中心'
                 },
                 component: () => import (/* webpackChunkName: "user" */ '../views/User.vue')
-            }, {
-                path: '/editor',
-                name: 'editor',
-                meta: {
-                    title: '富文本编辑器'
-                },
-                component: () => import (/* webpackChunkName: "editor" */ '../views/Editor.vue')
             }
         ]
     }, {
@@ -127,7 +106,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    document.title = `${to.meta.title} | vue-manage-system`;
+    document.title = `${to.meta.title} | iResearch - 科研管理系统`;
     const role = localStorage.getItem('ms_username');
     if (!role && to.path !== '/login') {
         next('/login');

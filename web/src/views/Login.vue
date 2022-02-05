@@ -1,7 +1,7 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">后台管理系统</div>
+            <div class="ms-title">iResearch - 科研管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
                     <el-input v-model="param.username" placeholder="username">
@@ -21,7 +21,6 @@
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
-                <p class="login-tips">Tips : 用户名和密码随便填。</p>
             </el-form>
         </div>
     </div>
@@ -37,8 +36,8 @@ export default {
     setup() {
         const router = useRouter();
         const param = reactive({
-            username: "admin",
-            password: "123123",
+            username: "",
+            password: "",
         });
 
         const rules = {
@@ -61,7 +60,7 @@ export default {
                     localStorage.setItem("ms_username", param.username);
                     router.push("/");
                 } else {
-                    ElMessage.error("登录成功");
+                    ElMessage.error("登录失败");
                     return false;
                 }
             });
@@ -85,7 +84,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url(../assets/img/login-bg.jpg);
+    background-image: url(../assets/img/bg.jpg);
     background-size: 100%;
 }
 .ms-title {
@@ -93,7 +92,7 @@ export default {
     line-height: 50px;
     text-align: center;
     font-size: 20px;
-    color: #fff;
+    color: #000;
     border-bottom: 1px solid #ddd;
 }
 .ms-login {
@@ -116,10 +115,5 @@ export default {
     width: 100%;
     height: 36px;
     margin-bottom: 10px;
-}
-.login-tips {
-    font-size: 12px;
-    line-height: 30px;
-    color: #fff;
 }
 </style>

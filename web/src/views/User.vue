@@ -16,7 +16,6 @@
                             </span>
                         </div>
                         <div class="info-name">{{ name }}</div>
-                        <div class="info-desc">不可能！我的代码怎么可能会有bug！</div>
                     </div>
                 </el-card>
             </el-col>
@@ -34,9 +33,6 @@
                         </el-form-item>
                         <el-form-item label="新密码：">
                             <el-input type="password" v-model="form.new"></el-input>
-                        </el-form-item>
-                        <el-form-item label="个人简介：">
-                            <el-input v-model="form.desc"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onSubmit">保存</el-button>
@@ -65,7 +61,7 @@
 import { reactive, ref } from "vue";
 import VueCropper from "vue-cropperjs";
 import "cropperjs/dist/cropper.css";
-import avatar from "../assets/img/img.jpg";
+import avatar from "../assets/img/user.png";
 export default {
     name: "user",
     components: {

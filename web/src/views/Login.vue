@@ -2,7 +2,7 @@
     <div class="login-wrap">
         <div class="ms-login">
             <div class="ms-title">iResearch - 科研管理系统</div>
-            <el-form :model="user" :rules="rules" ref="login" label-width="0px" class="ms-content">
+            <el-form :model="user" :rules="rules" ref="validate" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
                     <el-input v-model="user.username" placeholder="username">
                         <template #prepend>
@@ -12,7 +12,7 @@
                 </el-form-item>
                 <el-form-item prop="password">
                     <el-input type="password" placeholder="password" v-model="user.password"
-                        @keyup.enter="submitForm()">
+                        @keyup.enter="Login()">
                         <template #prepend>
                             <el-button icon="el-icon-lock"></el-button>
                         </template>
@@ -36,10 +36,6 @@ import axios from 'axios'
 export default {
     setup() {
         const router = useRouter();
-        const param = reactive({
-            username: "",
-            password: "",
-        });
         const user = reactive({
             username: "",
             password: "",
@@ -57,35 +53,32 @@ export default {
                 { required: true, message: "请输入密码", trigger: "blur" },
             ],
         };
-        const login = ref(null);
-        const submitForm = () => {
-            login.value.validate((valid) => {
-                if (valid) {
-                    ElMessage.success("登录成功");
-                    localStorage.setItem("ms_username", param.username);
-                    router.push("/");
-                } else {
-                    ElMessage.error("登录失败");
-                    return false;
-                }
-            });
-        };
+        const validate = ref(null);
 
         const Login = ()=>{
-            axios.get(HOST + '/login?name='+ user.username + '&password=' + user.password).then((response=>{
-                console.log(response);
-            }))
+            validate.value.validate()
+            axios.get(HOST + '/login?name='+ user.username + '&password=' + user.password).then((response)=>{
+               if (response.status == "200"){
+                    ElMessage.success("登录成功");
+                    localStorage.setItem("ms_username", response.data.type);
+                    router.push("/");
+               } else {
+                    throw false;
+               }
+            }).catch((err)=>{
+                console.log(err);
+                ElMessage.error("登录失败");
+                return false;
+            })
         }
 
         const store = useStore();
         store.commit("clearTags");
 
         return {
-            param,
             user,
             rules,
-            login,
-            submitForm,
+            validate,
             Login,
         };
     },

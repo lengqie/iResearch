@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar">
-        <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="#324157"
+        <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="#282c34"
             text-color="#bfcbd9" active-text-color="#20a0ff" unique-opened router>
             <template v-for="item in items">
                 <template v-if="item.subs">
@@ -47,7 +47,7 @@ export default {
             
             {
                 icon: "el-icon-lx-people",
-                index: "/table",
+                index: "/users",
                 title: "用户管理",
             },
 
@@ -57,11 +57,11 @@ export default {
                 title: "项目管理",
                 subs: [
                     {
-                        index: "/form",
+                        index: "/projectadd",
                         title: "添加",
                     },
                     {
-                        index: "/table",
+                        index: "/project",
                         title: "管理",
                     },
                 ],
@@ -69,13 +69,13 @@ export default {
 
             {
                 icon: "el-icon-lx-wifi",
-                index: "/table",
+                index: "/apply",
                 title: "申报管理",
             },
 
             {
                 icon: "el-icon-lx-lock",
-                index: "/table",
+                index: "/end",
                 title: "结课管理",
             },
             

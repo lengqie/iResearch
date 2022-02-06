@@ -18,26 +18,40 @@ const routes = [
                 },
                 component: () => import ( /* webpackChunkName: "dashboard" */ "../views/Dashboard.vue")
             }, {
-                path: "/table",
-                name: "basetable",
+                path: "/users",
+                name: "users",
                 meta: {
-                    title: '表格'
+                    title: '用户管理'
                 },
-                component: () => import ( /* webpackChunkName: "table" */ "../views/BaseTable.vue")
+                component: () => import ( /* webpackChunkName: "table" */ "../views/Users.vue")
             }, {
-                path: "/form",
-                name: "baseform",
+                path: "/projectadd",
+                name: "projectadd",
                 meta: {
-                    title: '表单'
+                    title: '项目添加'
                 },
-                component: () => import ( /* webpackChunkName: "form" */ "../views/BaseForm.vue")
+                component: () => import ( /* webpackChunkName: "tabs" */ "../views/ProjectAdd.vue")
             }, {
-                path: "/tabs",
-                name: "tabs",
+                path: "/project",
+                name: "project",
                 meta: {
-                    title: 'tab标签'
+                    title: '项目管理'
                 },
-                component: () => import ( /* webpackChunkName: "tabs" */ "../views/Tabs.vue")
+                component: () => import ( /* webpackChunkName: "tabs" */ "../views/Project.vue")
+            }, {
+                path: "/apply",
+                name: "apply",
+                meta: {
+                    title: '申报管理'
+                },
+                component: () => import ( /* webpackChunkName: "tabs" */ "../views/Apply.vue")
+            }, {
+                path: "/end",
+                name: "end",
+                meta: {
+                    title: '结课管理'
+                },
+                component: () => import ( /* webpackChunkName: "tabs" */ "../views/End.vue")
             }, {
                 path: "/permission",
                 name: "permission",
@@ -46,20 +60,6 @@ const routes = [
                     permission: true
                 },
                 component: () => import ( /* webpackChunkName: "permission" */ "../views/Permission.vue")
-            }, {
-                path: "/i18n",
-                name: "i18n",
-                meta: {
-                    title: '国际化语言'
-                },
-                component: () => import ( /* webpackChunkName: "i18n" */ "../views/I18n.vue")
-            }, {
-                path: "/upload",
-                name: "upload",
-                meta: {
-                    title: '上传插件'
-                },
-                component: () => import ( /* webpackChunkName: "upload" */ "../views/Upload.vue")
             }, {
                 path: "/icon",
                 name: "icon",

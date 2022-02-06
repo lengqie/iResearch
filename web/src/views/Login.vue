@@ -2,16 +2,16 @@
     <div class="login-wrap">
         <div class="ms-login">
             <div class="ms-title">iResearch - 科研管理系统</div>
-            <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
+            <el-form :model="user" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="username">
+                    <el-input v-model="user.username" placeholder="username">
                         <template #prepend>
                             <el-button icon="el-icon-user"></el-button>
                         </template>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" placeholder="password" v-model="param.password"
+                    <el-input type="password" placeholder="password" v-model="user.password"
                         @keyup.enter="submitForm()">
                         <template #prepend>
                             <el-button icon="el-icon-lock"></el-button>
@@ -19,7 +19,7 @@
                     </el-input>
                 </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" @click="submitForm()">登录</el-button>
+                    <el-button type="primary" @click="Login()">登录</el-button>
                 </div>
             </el-form>
         </div>
@@ -31,11 +31,16 @@ import { ref, reactive } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
+import axios from 'axios'
 
 export default {
     setup() {
         const router = useRouter();
         const param = reactive({
+            username: "",
+            password: "",
+        });
+        const user = reactive({
             username: "",
             password: "",
         });
@@ -66,14 +71,22 @@ export default {
             });
         };
 
+        const Login = ()=>{
+            axios.get(HOST + '/login?name='+ user.username + '&password=' + user.password).then((response=>{
+                console.log(response);
+            }))
+        }
+
         const store = useStore();
         store.commit("clearTags");
 
         return {
             param,
+            user,
             rules,
             login,
             submitForm,
+            Login,
         };
     },
 };

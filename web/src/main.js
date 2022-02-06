@@ -9,7 +9,6 @@ import './global.js'
 
 const app = createApp(App)
 installElementPlus(app)
-app
-    .use(store)
-    .use(router)
-    .mount('#app')
+app.use(store)
+   .use(router)
+   .mount('#app')

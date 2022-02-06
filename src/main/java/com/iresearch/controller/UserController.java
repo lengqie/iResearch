@@ -3,6 +3,7 @@ package com.iresearch.controller;
 
 import com.iresearch.entity.User;
 import com.iresearch.service.IUserService;
+import com.iresearch.vo.UserVO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -31,10 +32,10 @@ public class UserController {
     IUserService iUserService;
 
     @GetMapping
-    public List<User> getUsers(HttpServletResponse response){
+    public List<UserVO> getUsers(HttpServletResponse response){
         final List<User> users = iUserService.list();
         response.setStatus(HttpStatus.OK.value());
-        return users;
+        return iUserService.userList2userVOList(users);
     }
 
     @PostMapping

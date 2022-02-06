@@ -54,6 +54,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public UserVO user2userVO(User user) {
         UserVO userVO =  new UserVO();
+        userVO.setId(user.getId());
         userVO.setName(user.getName());
         userVO.setNickname(user.getNickname());
         userVO.setType(getUserTypeStringByName(user.getName()));

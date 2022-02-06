@@ -2,6 +2,7 @@ package com.iresearch.controller;
 
 import com.iresearch.entity.User;
 import com.iresearch.service.IUserService;
+import com.iresearch.vo.UserVO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -21,11 +22,11 @@ import javax.servlet.http.HttpServletResponse;
 public class CommonController {
 
     @Autowired
-    IUserService userService;
+    IUserService iUserService;
 
     @GetMapping("/login")
-    public User login(String name, String password,
-                      HttpServletResponse response){
+    public UserVO login(String name, String password,
+                        HttpServletResponse response){
         // 输入处理
         if (name == null || password == null){
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -34,7 +35,8 @@ public class CommonController {
         final Subject subject = SecurityUtils.getSubject();
         subject.login(new UsernamePasswordToken(name,password));
         final String username = ((String) subject.getPrincipal());
-        return userService.getUserByName(username);
+        final User user = iUserService.getUserByName(username);
+        return iUserService.user2userVO(user);
     }
 
     /**

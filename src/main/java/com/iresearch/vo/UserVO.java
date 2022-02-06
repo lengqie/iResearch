@@ -13,6 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserVO implements Serializable {
+    private Integer id;
     private String name;
     private String nickname;
     private String type;

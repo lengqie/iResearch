@@ -103,11 +103,11 @@
 </template>
 
 <script>
-import Schart from "vue-schart";
 import { reactive } from "vue";
+import { ref } from 'vue'
+
 export default {
     name: "dashboard",
-    components: { Schart },
     setup() {
         const name = localStorage.getItem("ms_username");
         const role = name === "admin" ? "超级管理员" : "普通用户";

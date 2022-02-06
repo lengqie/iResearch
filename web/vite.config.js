@@ -4,6 +4,5 @@ export default {
     base: './',
     plugins: [vue()],
     optimizeDeps: {
-        include: ['schart.js']
     }
 }

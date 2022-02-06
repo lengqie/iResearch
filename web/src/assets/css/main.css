@@ -175,3 +175,8 @@ a {
 .v-note-wrapper .v-note-panel {
     min-height: 500px;
 }
+
+.sudo{
+    display: inline;
+    /* margin-left: 5px; */
+}

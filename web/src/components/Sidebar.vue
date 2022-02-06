@@ -15,7 +15,6 @@
                                 <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">
                                     {{ threeItem.title }}</el-menu-item>
                             </el-submenu>
-                            <!-- <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }} -->
                             <el-menu-item v-else :index="subItem.index" :key="subItem.title">{{ subItem.title }}
                             </el-menu-item>
                         </template>

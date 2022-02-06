@@ -3,40 +3,48 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 基础表格
+                    <i class="el-icon-lx-cascades"></i> 用户管理
                 </el-breadcrumb-item>
+                
             </el-breadcrumb>
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
                 <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button type="primary" icon="el-icon-plus" @click="dialogVisible = true">添加用户</el-button>
+                <!-- 编辑弹出框 -->
+                <el-dialog title="添加用户" v-model="dialogVisible" width="30%">
+                    <el-form label-width="70px">
+                        <el-form-item label="用户名">
+                            <el-input v-model="form.name"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码">
+                            <el-input v-model="form.password"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <template #footer>
+                        <span class="dialog-footer">
+                            <el-button @click="dialogVisible = false">取 消</el-button>
+                            <el-button type="primary" @click="saveEdit">确 定</el-button>
+                        </span>
+                    </template>
+                </el-dialog>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
                 <el-table-column prop="name" label="用户名"></el-table-column>
-                <el-table-column label="账户余额">
+                <el-table-column label="昵称">
                     <template #default="scope">￥{{ scope.row.money }}</template>
                 </el-table-column>
-                <el-table-column label="头像(查看大图)" align="center">
-                    <template #default="scope">
-                        <el-image class="table-td-thumb" :src="scope.row.thumb" :preview-src-list="[scope.row.thumb]">
-                        </el-image>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="address" label="地址"></el-table-column>
                 <el-table-column label="状态" align="center">
                     <template #default="scope">
                         <el-tag :type="
                                 scope.row.state === '成功'
                                     ? 'success'
-                                    : scope.row.state === '失败'
+                                    : scope.row.state === '冻结'
                                     ? 'danger'
-                                    : ''
+                                    : 'danger'
                             ">{{ scope.row.state }}</el-tag>
                     </template>
                 </el-table-column>
@@ -60,10 +68,8 @@
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-model="editVisible" width="30%">
             <el-form label-width="70px">
-                <el-form-item label="用户名">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="地址">
+                <el-form-item label="用户名："> 张三 </el-form-item>
+                <el-form-item label="密码">
                     <el-input v-model="form.address"></el-input>
                 </el-form-item>
             </el-form>
@@ -130,7 +136,7 @@ export default {
         const editVisible = ref(false);
         let form = reactive({
             name: "",
-            address: "",
+            password: "",
         });
         let idx = -1;
         const handleEdit = (index, row) => {
@@ -147,7 +153,7 @@ export default {
                 tableData.value[idx][item] = form[item];
             });
         };
-
+        const dialogVisible = ref(false)
         return {
             query,
             tableData,
@@ -159,6 +165,7 @@ export default {
             handleDelete,
             handleEdit,
             saveEdit,
+            dialogVisible,
         };
     },
 };

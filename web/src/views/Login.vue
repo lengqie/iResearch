@@ -59,6 +59,7 @@ export default {
                     ElMessage.success("登录成功");
                     localStorage.setItem("ms_username", param.username);
                     router.push("/");
+                    console.log(HOST);
                 } else {
                     ElMessage.error("登录失败");
                     return false;

@@ -33,7 +33,8 @@ public class CommonController {
         }
         final Subject subject = SecurityUtils.getSubject();
         subject.login(new UsernamePasswordToken(name,password));
-        return new User();
+        final String username = ((String) subject.getPrincipal());
+        return userService.getUserByName(username);
     }
 
     /**

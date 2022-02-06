@@ -7,9 +7,12 @@ import com.iresearch.mapper.UserMapper;
 import com.iresearch.mapper.UserTypeMapper;
 import com.iresearch.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.iresearch.vo.UserVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -46,6 +49,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         final UserType userType = userTypeMapper.selectOne(userTypeWrapper);
 
         return userType.getType();
+    }
+
+    @Override
+    public UserVO user2userVO(User user) {
+        UserVO userVO =  new UserVO();
+        userVO.setName(user.getName());
+        userVO.setNickname(user.getNickname());
+        userVO.setType(getUserTypeStringByName(user.getName()));
+        return userVO;
+}
+
+    @Override
+    public List<UserVO> userList2userVOList(List<User> users) {
+        List<UserVO> userVOs = new ArrayList<>();
+        for (User user : users) {
+            userVOs.add(user2userVO(user));
+        }
+        return userVOs;
     }
 
 }

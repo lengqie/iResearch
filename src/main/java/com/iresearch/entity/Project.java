@@ -37,7 +37,7 @@ public class Project implements Serializable {
 
     private Integer projectType;
 
-    @TableLogic
+    // @TableLogic
     private Integer projectStatus;
 
     private Integer fileId;

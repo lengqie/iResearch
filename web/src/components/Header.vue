@@ -33,6 +33,8 @@
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import axios from 'axios'
+
 export default {
     setup() {
         const username = localStorage.getItem("ms_username");
@@ -56,7 +58,11 @@ export default {
         const handleCommand = (command) => {
             if (command == "loginout") {
                 localStorage.removeItem("ms_username");
+                localStorage.removeItem("user_type");
                 router.push("/login");
+            axios.post("/api" + "/logout").then((response)=>{
+                    console.log(response);
+                })
             } else if (command == "user") {
                 router.push("/user");
             }

@@ -189,7 +189,7 @@ public class ProjectController {
             return;
         }
         // 删除
-        iProjectService.removeById(id);
+        iProjectService.updateProjectStatus(id,ProjectEnum.DELETED.value());
         response.setStatus(HttpStatus.OK.value());
         // 操作记录
         Operation operation =new Operation();
@@ -247,7 +247,7 @@ public class ProjectController {
     }
 
     /**
-     * 修改用户状态
+     * 修改项目状态
      */
     @PutMapping("/{id}/status/{status}")
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)

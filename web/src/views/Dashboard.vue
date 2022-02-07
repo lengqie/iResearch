@@ -2,77 +2,58 @@
     <div>
         <el-row :gutter="20">
             <el-col :span="8">
-                <el-card shadow="hover" class="mgb20" style="height:252px;">
+                <el-card shadow="hover" class="mgb20" style="height:200px;">
                     <div class="user-info">
-                        <img src="../assets/img/user.png" class="user-avator" alt />
+                        <img src="../assets/img/user.png" class="user-avabommouttor" alt />
                         <div class="user-info-cont">
                             <div class="user-info-name">{{ name }}</div>
                             <div>{{ role }}</div>
                         </div>
                     </div>
-                    <div class="user-info-list">
-                        上次登录时间：
-                        <span>2019-11-01</span>
-                    </div>
-                    <div class="user-info-list">
-                        上次登录地点：
-                        <span>东莞</span>
-                    </div>
                 </el-card>
-                <el-card shadow="hover" style="height:252px;">
-                    <template #header>
-                        <div class="clearfix">
-                            <span>语言详情</span>
-                        </div>
-                    </template>
-                    Vue
-                    <el-progress :percentage="71.3" color="#42b983"></el-progress>JavaScript
-                    <el-progress :percentage="24.1" color="#f1e05a"></el-progress>CSS
-                    <el-progress :percentage="13.7"></el-progress>HTML
-                    <el-progress :percentage="5.9" color="#f56c6c"></el-progress>
-                </el-card>
-            </el-col>
-            <el-col :span="16">
                 <el-row :gutter="20" class="mgb20">
-                    <el-col :span="8">
+                    <el-col :span="24" style="margin-bottom: 10px;">
                         <el-card shadow="hover" :body-style="{ padding: '0px' }">
                             <div class="grid-content grid-con-1">
-                                <i class="el-icon-user-solid grid-con-icon"></i>
+                                <i class="el-icon-s-goods grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">1234</div>
-                                    <div>用户访问量</div>
+                                    <div class="grid-num">{{project}}</div>
+                                    <div>项目总数</div>
                                 </div>
                             </div>
                         </el-card>
                     </el-col>
-                    <el-col :span="8">
+                    
+                    <el-col :span="24" style="margin-bottom: 10px;">
                         <el-card shadow="hover" :body-style="{ padding: '0px' }">
                             <div class="grid-content grid-con-2">
-                                <i class="el-icon-message-solid grid-con-icon"></i>
+                                <i class="el-icon-s-goods grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">321</div>
-                                    <div>系统消息</div>
+                                    <div class="grid-num">{{apply}}</div>
+                                    <div>申报总数</div>
                                 </div>
                             </div>
                         </el-card>
                     </el-col>
-                    <el-col :span="8">
+                    
+                    <el-col :span="24" style="margin-bottom: 10px;">
                         <el-card shadow="hover" :body-style="{ padding: '0px' }">
                             <div class="grid-content grid-con-3">
                                 <i class="el-icon-s-goods grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">5000</div>
-                                    <div>数量</div>
+                                    <div class="grid-num">{{end}}</div>
+                                    <div>结课总数</div>
                                 </div>
                             </div>
                         </el-card>
                     </el-col>
                 </el-row>
-                <el-card shadow="hover" style="height:403px;">
+            </el-col>
+            <el-col :span="16">
+                <el-card shadow="hover" style="height:545px;">
                     <template #header>
                         <div class="clearfix">
-                            <span>待办事项</span>
-                            <el-button style="float: right; padding: 3px 0" type="text">添加</el-button>
+                            <span>待办</span>
                         </div>
                     </template>
 
@@ -103,88 +84,29 @@
 </template>
 
 <script>
-import { reactive } from "vue";
-import { ref } from 'vue'
+import { reactive , ref } from "vue";
+import axios from 'axios'
+
 
 export default {
     name: "dashboard",
+
+    mounted(){
+        axios.get("/api" + "/iresearch/project").then((response)=>{
+                let data = response.data;
+                this.project = data.length
+            }).catch((error)=>{
+                console.log(error);
+            })
+        },
     setup() {
         const name = localStorage.getItem("ms_username");
-        const role = name === "admin" ? "超级管理员" : "普通用户";
+        const role = localStorage.getItem("user_type") === "admin" ? "超级管理员" : "普通用户";
 
-        const data = reactive([
-            {
-                name: "2018/09/04",
-                value: 1083,
-            },
-            {
-                name: "2018/09/05",
-                value: 941,
-            },
-            {
-                name: "2018/09/06",
-                value: 1139,
-            },
-            {
-                name: "2018/09/07",
-                value: 816,
-            },
-            {
-                name: "2018/09/08",
-                value: 327,
-            },
-            {
-                name: "2018/09/09",
-                value: 228,
-            },
-            {
-                name: "2018/09/10",
-                value: 1065,
-            },
-        ]);
-        const options = {
-            type: "bar",
-            title: {
-                text: "最近一周各品类销售图",
-            },
-            xRorate: 25,
-            labels: ["周一", "周二", "周三", "周四", "周五"],
-            datasets: [
-                {
-                    label: "家电",
-                    data: [234, 278, 270, 190, 230],
-                },
-                {
-                    label: "百货",
-                    data: [164, 178, 190, 135, 160],
-                },
-                {
-                    label: "食品",
-                    data: [144, 198, 150, 235, 120],
-                },
-            ],
-        };
-        const options2 = {
-            type: "line",
-            title: {
-                text: "最近几个月各品类销售趋势图",
-            },
-            labels: ["6月", "7月", "8月", "9月", "10月"],
-            datasets: [
-                {
-                    label: "家电",
-                    data: [234, 278, 270, 190, 230],
-                },
-                {
-                    label: "百货",
-                    data: [164, 178, 150, 135, 160],
-                },
-                {
-                    label: "食品",
-                    data: [74, 118, 200, 235, 90],
-                },
-            ],
-        };
+        let project = ref(0);
+        let apply = 0;
+        let end = 0;
+
         const todoList = reactive([
             {
                 title: "今天要修复100个bug",
@@ -194,31 +116,15 @@ export default {
                 title: "今天要修复100个bug",
                 status: false,
             },
-            {
-                title: "今天要写100行代码加几个bug吧",
-                status: false,
-            },
-            {
-                title: "今天要修复100个bug",
-                status: false,
-            },
-            {
-                title: "今天要修复100个bug",
-                status: true,
-            },
-            {
-                title: "今天要写100行代码加几个bug吧",
-                status: true,
-            },
         ]);
 
         return {
             name,
-            data,
-            options,
-            options2,
             todoList,
             role,
+            project,
+            apply,
+            end,
         };
     },
 };

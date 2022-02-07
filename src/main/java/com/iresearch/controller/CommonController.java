@@ -9,10 +9,7 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,7 +27,7 @@ public class CommonController {
                         HttpServletResponse response){
         // 输入处理
         if (name == null || password == null){
-            response.setStatus(HttpStatus.NOT_FOUND.value());
+            response.setStatus(HttpStatus.OK.value());
             return null;
         }
         final Subject subject = SecurityUtils.getSubject();
@@ -38,6 +35,13 @@ public class CommonController {
         final String username = ((String) subject.getPrincipal());
         final User user = iUserService.getUserByName(username);
         return iUserService.user2userVO(user);
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpServletResponse response){
+        final Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        response.setStatus(HttpStatus.OK.value());
     }
 
     /**

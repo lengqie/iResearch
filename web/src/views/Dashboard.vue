@@ -29,8 +29,8 @@
                             <div class="grid-content grid-con-2">
                                 <i class="el-icon-s-goods grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">{{apply}}</div>
-                                    <div>申报总数</div>
+                                    <div class="grid-num">{{pending}}</div>
+                                    <div>待处理</div>
                                 </div>
                             </div>
                         </el-card>
@@ -57,26 +57,23 @@
                         </div>
                     </template>
 
-                    <el-table :show-header="false" :data="todoList" style="width:100%;">
-                        <el-table-column width="40">
-                            <template #default="scope">
-                                <el-checkbox v-model="scope.row.status"></el-checkbox>
-                            </template>
-                        </el-table-column>
-                        <el-table-column>
-                            <template #default="scope">
-                                <div class="todo-item" :class="{
-                                        'todo-item-del': scope.row.status,
-                                    }">{{ scope.row.title }}</div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column width="60">
-                            <template>
-                                <i class="el-icon-edit"></i>
-                                <i class="el-icon-delete"></i>
-                            </template>
-                        </el-table-column>
-                    </el-table>
+                <el-table :data="pendingList" style="width: 100%">
+                    <el-table-column prop="title" label="项目名称" width="800px" />
+                    <el-table-column
+                        prop="status"
+                        label="状态"
+                        width="100"
+                        >
+                        <template #default="scope">
+                            <el-tag
+                            :type="scope.row.status === '申报中' ? '' : 'success'"
+                            disable-transitions
+                            >{{ scope.row.status }}</el-tag
+                            >
+                        </template>
+                    </el-table-column>
+                </el-table>
+                
                 </el-card>
             </el-col>
         </el-row>
@@ -92,9 +89,42 @@ export default {
     name: "dashboard",
 
     mounted(){
+        // 总数
         axios.get("/api" + "/iresearch/project").then((response)=>{
                 let data = response.data;
                 this.project = data.length
+            }).catch((error)=>{
+                console.log(error);
+            })
+        // 待处理
+        axios.get("/api" + "/iresearch/project/status/1").then((response)=>{
+                let data = response.data;
+                this.pending += data.length
+                data.forEach(pro => {
+                    this.pendingList.push({
+                        'title': pro.name,
+                        'status': "申报中",
+                    })
+                });
+            }).catch((error)=>{
+                console.log(error);
+            })
+        axios.get("/api" + "/iresearch/project/status/3").then((response)=>{
+                let data = response.data;
+                this.pending += data.length
+                data.forEach(pro => {
+                    this.pendingList.push({
+                        'title': pro.name,
+                        'status': "结课中",
+                    })
+                });
+            }).catch((error)=>{
+                console.log(error);
+            })
+        // 结课
+        axios.get("/api" + "/iresearch/project/status/4").then((response)=>{
+                let data = response.data;
+                this.end = data.length
             }).catch((error)=>{
                 console.log(error);
             })
@@ -104,26 +134,17 @@ export default {
         const role = localStorage.getItem("user_type") === "admin" ? "超级管理员" : "普通用户";
 
         let project = ref(0);
-        let apply = 0;
-        let end = 0;
+        let pending = ref(0);
+        let end = ref(0);
 
-        const todoList = reactive([
-            {
-                title: "今天要修复100个bug",
-                status: false,
-            },
-            {
-                title: "今天要修复100个bug",
-                status: false,
-            },
-        ]);
-
+        const pendingList = reactive([]);
+        
         return {
             name,
-            todoList,
+            pendingList,
             role,
             project,
-            apply,
+            pending,
             end,
         };
     },

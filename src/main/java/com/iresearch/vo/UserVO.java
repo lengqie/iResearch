@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author lengqie
@@ -16,5 +17,6 @@ public class UserVO implements Serializable {
     private Integer id;
     private String name;
     private String nickname;
-    private String type;
+    private String type ;
+    private LocalDateTime createTime;
 }

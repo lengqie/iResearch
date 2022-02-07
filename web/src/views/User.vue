@@ -24,7 +24,9 @@
                         </div>
                     </template>
                     <el-form label-width="90px">
-                        <el-form-item label="用户名："> {{ name }} </el-form-item>
+                        <el-form-item label="昵称">
+                            <el-input type="text" v-model="form.nick"></el-input>
+                        </el-form-item>
                         <el-form-item label="旧密码：">
                             <el-input type="password" v-model="form.old"></el-input>
                         </el-form-item>
@@ -59,22 +61,19 @@ export default {
         const name = localStorage.getItem("ms_username");
         const router = useRouter();
         const form = reactive({
+            nick:name,
             old: "",
             new: "",
             again: "",
         });
         const onSubmit = () => {
-            if (form.old == form.new){
-                ElMessage.error("新密码不得相同");
-                return false;
-            } else if (form.new != form.again){
-                ElMessage.error("确认密码不同");
-                return false;
-            } else{
-                axios.post("/api" + "/iresearch/user/" + form.old + "/" + form.new).then((response)=>{
+            // 修改昵称
+            if(form.nick != ""){
+                axios.post("/api" + "/iresearch/user/nickname?nickname=" + form.nick).then((response)=>{
                 if (response.status == "200"){
-                        ElMessage.success("修改成功");
-                        router.push("/login");
+                        localStorage.setItem("ms_username", form.nick);
+                        location.reload();
+                        ElMessage.success("昵称修改成功");
                 } else {
                         throw false;
                 }
@@ -83,6 +82,29 @@ export default {
                     ElMessage.error("修改失败");
                     return false;
                 })
+            }
+            // 修改密码
+            if(form.new != "" && form.old != "" && form.again!=""){
+                if (form.old == form.new){
+                    ElMessage.error("新密码不得相同");
+                    return false;
+                } else if (form.new != form.again){
+                    ElMessage.error("确认密码不同");
+                    return false;
+                } else{
+                    axios.post("/api" + "/iresearch/user/" + form.old + "/" + form.new).then((response)=>{
+                    if (response.status == "200"){
+                            ElMessage.success("修改成功");
+                            router.push("/login");
+                    } else {
+                            throw false;
+                    }
+                    }).catch((err)=>{
+                        console.log(err);
+                        ElMessage.error("修改失败");
+                        return false;
+                    })
+            }
             }
         };
 

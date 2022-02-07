@@ -37,17 +37,6 @@
                 <el-table-column label="昵称">
                     <template #default="scope">￥{{ scope.row.money }}</template>
                 </el-table-column>
-                <el-table-column label="状态" align="center">
-                    <template #default="scope">
-                        <el-tag :type="
-                                scope.row.state === '成功'
-                                    ? 'success'
-                                    : scope.row.state === '冻结'
-                                    ? 'danger'
-                                    : 'danger'
-                            ">{{ scope.row.state }}</el-tag>
-                    </template>
-                </el-table-column>
 
                 <el-table-column prop="date" label="注册时间"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">

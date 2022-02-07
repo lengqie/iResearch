@@ -61,7 +61,7 @@ export default {
                if (response.status == "200"){
                 //    console.log(response);
                     ElMessage.success("登录成功");
-                    localStorage.setItem("ms_username", response.data.name);
+                    localStorage.setItem("ms_username", response.data.nickname);
                     localStorage.setItem("user_type", response.data.type);
                     router.push("/");
                } else {

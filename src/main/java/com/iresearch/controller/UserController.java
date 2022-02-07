@@ -33,6 +33,9 @@ public class UserController {
     @Autowired
     IUserService iUserService;
 
+    /**
+     *  获取全部 user
+     */
     @RequiresRoles(value = {"admin"})
     @GetMapping
     public List<UserVO> getUsers(HttpServletResponse response){
@@ -40,6 +43,10 @@ public class UserController {
         response.setStatus(HttpStatus.OK.value());
         return iUserService.userList2userVOList(users);
     }
+
+    /**
+     * 添加用户
+     */
 
     @PostMapping
     public void addUser(String name, String password, String nickName, int type,
@@ -59,15 +66,19 @@ public class UserController {
         }
     }
 
+    /**
+     * 修改用户
+     */
     @PutMapping
-    public void updateUser(int id, String name, String password, String nickName, int type,
+    public void updateUser(int id, String name, String password, String nickName,
                         HttpServletResponse response){
         User user = new User();
         user.setId(id);
         user.setName(name);
         user.setPassword(password);
         user.setNickname(nickName);
-        user.setUserType(type);
+        // 默认 都为1
+        user.setUserType(1);
         user.setUpdateTime(LocalDateTime.now());
 
         final boolean save = iUserService.updateById(user);
@@ -78,6 +89,24 @@ public class UserController {
         }
     }
 
+    /**
+     * 修改昵称 (注意 shiro PathVariable 传递中文)
+     */
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
+    @PostMapping("/nickname")
+    public void updateNickname(String nickname,
+                               HttpServletResponse response){
+        final Subject subject = SecurityUtils.getSubject();
+        final String name = (String) subject.getPrincipal();
+        final User user = iUserService.getUserByName(name);
+        user.setNickname(nickname);
+        iUserService.updateById(user);
+        response.setStatus(HttpStatus.OK.value());
+    }
+    /**
+     * 修改密码
+     */
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @PostMapping("/{oldpsw}/{newpsw}")
     public void updatePassword(@PathVariable String oldpsw, @PathVariable String newpsw,
                                HttpServletResponse response){
@@ -92,6 +121,20 @@ public class UserController {
         } else {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
+    }
+
+    /**
+     * 管理员 根据 id 修改密码
+     */
+    @RequiresRoles({"admin"})
+    @PostMapping("/id/{userid}/{newpsw}")
+    public void updatePasswordById(@PathVariable String userid, @PathVariable String newpsw,
+                                   HttpServletResponse response){
+        final User user = iUserService.getById(userid);
+        user.setPassword(newpsw);
+        iUserService.updateById(user);
+        response.setStatus(HttpStatus.OK.value());
+
     }
 
     // login 与 logout 重复

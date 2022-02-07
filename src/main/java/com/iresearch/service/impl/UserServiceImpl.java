@@ -58,6 +58,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userVO.setName(user.getName());
         userVO.setNickname(user.getNickname());
         userVO.setType(getUserTypeStringByName(user.getName()));
+        userVO.setCreateTime(user.getCreateTime());
         return userVO;
 }
 

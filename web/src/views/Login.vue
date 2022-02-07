@@ -57,11 +57,19 @@ export default {
 
         const Login = ()=>{
             validate.value.validate()
-            axios.get(HOST + '/login?name='+ user.username + '&password=' + user.password).then((response)=>{
+            axios.get("/api" + '/login?name='+ user.username + '&password=' + user.password).then((response)=>{
+            // axios.get(HOST + '/login?name='+ user.username + '&password=' + user.password).then((response)=>{
                if (response.status == "200"){
+                   console.log(response);
                     ElMessage.success("登录成功");
                     localStorage.setItem("ms_username", response.data.type);
                     router.push("/");
+
+                    // axios.get(HOST + '/login?name='+ user.username + '&password=' + user.password)
+                    // axios.get(HOST + "/iresearch/user").then((response)=>{
+                    axios.get("/api" + "/iresearch/user").then((response)=>{
+                        console.log(response);
+                    })
                } else {
                     throw false;
                }

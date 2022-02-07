@@ -6,6 +6,8 @@ import com.iresearch.service.IUserService;
 import com.iresearch.vo.UserVO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,7 @@ public class UserController {
     @Autowired
     IUserService iUserService;
 
+    @RequiresRoles(value = {"admin"})
     @GetMapping
     public List<UserVO> getUsers(HttpServletResponse response){
         final List<User> users = iUserService.list();

@@ -27,7 +27,7 @@ public class CommonController {
                         HttpServletResponse response){
         // 输入处理
         if (name == null || password == null){
-            response.setStatus(HttpStatus.OK.value());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
         }
         final Subject subject = SecurityUtils.getSubject();

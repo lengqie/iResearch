@@ -43,13 +43,6 @@ export default {
                 index: "/dashboard",
                 title: "系统首页",
             },
-            
-            {
-                icon: "el-icon-lx-people",
-                index: "/users",
-                title: "用户管理",
-            },
-
             {
                 icon: "el-icon-lx-calendar",
                 index: "3",
@@ -109,10 +102,22 @@ export default {
         const store = useStore();
         const collapse = computed(() => store.state.collapse);
 
+        const role = localStorage.getItem("user_type") === "admin";
+        if(role){
+            items.splice(1,0,
+                {
+                icon: "el-icon-lx-people",
+                index: "/users",
+                title: "用户管理",
+                }
+            )
+        }
+
         return {
             items,
             onRoutes,
             collapse,
+            role,
         };
     },
 };

@@ -78,6 +78,24 @@ public class UserController {
         }
     }
 
+    @PostMapping("/{oldpsw}/{newpsw}")
+    public void updatePassword(@PathVariable String oldpsw, @PathVariable String newpsw,
+                               HttpServletResponse response){
+        final Subject subject = SecurityUtils.getSubject();
+        final String name = (String) subject.getPrincipal();
+
+        final User user = iUserService.getUserByName(name);
+        if (oldpsw.equals(user.getPassword())){
+            user.setPassword(newpsw);
+            iUserService.updateById(user);
+            response.setStatus(HttpStatus.OK.value());
+        } else {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+        }
+    }
+
+    // login 与 logout 重复
+
     @PostMapping("/login")
     public void login(String name,String password,
                       HttpServletResponse response){

@@ -2,18 +2,15 @@
     <div>
         <el-row :gutter="20">
             <el-col :span="12">
-                <el-card shadow="hover">
+                <el-card shadow="hover" style="height: 410px;">
                     <template #header>
                         <div class="clearfix">
                             <span>基础信息</span>
                         </div>
                     </template>
                     <div class="info">
-                        <div class="info-image" @click="showDialog">
+                        <div class="info-image">
                             <img :src="avatarImg" />
-                            <span class="info-edit">
-                                <i class="el-icon-lx-camerafill"></i>
-                            </span>
                         </div>
                         <div class="info-name">{{ name }}</div>
                     </div>
@@ -34,6 +31,9 @@
                         <el-form-item label="新密码：">
                             <el-input type="password" v-model="form.new"></el-input>
                         </el-form-item>
+                        <el-form-item label="确认密码：">
+                            <el-input type="password" v-model="form.again"></el-input>
+                        </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onSubmit">保存</el-button>
                         </el-form-item>
@@ -41,88 +41,58 @@
                 </el-card>
             </el-col>
         </el-row>
-        <el-dialog title="裁剪图片" v-model="dialogVisible" width="600px">
-            <vue-cropper ref="cropper" :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage"
-                style="width: 100%; height: 400px"></vue-cropper>
-
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button class="crop-demo-btn" type="primary">选择图片
-                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage" />
-                    </el-button>
-                    <el-button type="primary" @click="saveAvatar">上传并保存</el-button>
-                </span>
-            </template>
-        </el-dialog>
     </div>
 </template>
 
 <script>
 import { reactive, ref } from "vue";
-import VueCropper from "vue-cropperjs";
-import "cropperjs/dist/cropper.css";
 import avatar from "../assets/img/user.png";
+import axios from 'axios'
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+
+
 export default {
     name: "user",
-    components: {
-        VueCropper,
-    },
+
     setup() {
         const name = localStorage.getItem("ms_username");
+        const router = useRouter();
         const form = reactive({
             old: "",
             new: "",
-            desc: "不可能！我的代码怎么可能会有bug！",
+            again: "",
         });
-        const onSubmit = () => {};
+        const onSubmit = () => {
+            if (form.old == form.new){
+                ElMessage.error("新密码不得相同");
+                return false;
+            } else if (form.new != form.again){
+                ElMessage.error("确认密码不同");
+                return false;
+            } else{
+                axios.post("/api" + "/iresearch/user/" + form.old + "/" + form.new).then((response)=>{
+                if (response.status == "200"){
+                        ElMessage.success("修改成功");
+                        router.push("/login");
+                } else {
+                        throw false;
+                }
+                }).catch((err)=>{
+                    console.log(err);
+                    ElMessage.error("修改失败");
+                    return false;
+                })
+            }
+        };
 
         const avatarImg = ref(avatar);
-        const imgSrc = ref("");
-        const cropImg = ref("");
-        const dialogVisible = ref(false);
-        const cropper = ref(null);
-
-        const showDialog = () => {
-            dialogVisible.value = true;
-            imgSrc.value = avatarImg.value;
-        };
-
-        const setImage = (e) => {
-            const file = e.target.files[0];
-            if (!file.type.includes("image/")) {
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                dialogVisible.value = true;
-                imgSrc.value = event.target.result;
-                cropper.value && cropper.value.replace(event.target.result);
-            };
-            reader.readAsDataURL(file);
-        };
-
-        const cropImage = () => {
-            cropImg.value = cropper.value.getCroppedCanvas().toDataURL();
-        };
-
-        const saveAvatar = () => {
-            avatarImg.value = cropImg.value;
-            dialogVisible.value = false;
-        };
 
         return {
             name,
             form,
             onSubmit,
-            cropper,
             avatarImg,
-            imgSrc,
-            cropImg,
-            showDialog,
-            dialogVisible,
-            setImage,
-            cropImage,
-            saveAvatar,
         };
     },
 };

@@ -1,6 +1,7 @@
 package com.iresearch.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.iresearch.entity.User;
 import com.iresearch.service.IUserService;
 import com.iresearch.vo.UserVO;
@@ -45,17 +46,32 @@ public class UserController {
     }
 
     /**
+     *  查询 user
+     */
+    @RequiresRoles(value = {"admin"})
+    @GetMapping("/{search}")
+    public List<UserVO> getUsersSearch(HttpServletResponse response, @PathVariable String search){
+        final LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(User::getName,search);
+        final List<User> users = iUserService.list(wrapper);
+        response.setStatus(HttpStatus.OK.value());
+        return iUserService.userList2userVOList(users);
+    }
+
+    /**
      * 添加用户
      */
 
     @PostMapping
-    public void addUser(String name, String password, String nickName, int type,
+    public void addUser(String name, String password,
                         HttpServletResponse response){
         User user = new User();
         user.setName(name);
         user.setPassword(password);
-        user.setNickname(nickName);
-        user.setUserType(type);
+        // 默认 昵称 为 用户名
+        // 默认 用户类型 为 user
+        user.setNickname(name);
+        user.setUserType(1);
         user.setCreateTime(LocalDateTime.now());
 
         final boolean save = iUserService.save(user);
@@ -77,8 +93,6 @@ public class UserController {
         user.setName(name);
         user.setPassword(password);
         user.setNickname(nickName);
-        // 默认 都为1
-        user.setUserType(1);
         user.setUpdateTime(LocalDateTime.now());
 
         final boolean save = iUserService.updateById(user);
@@ -100,6 +114,7 @@ public class UserController {
         final String name = (String) subject.getPrincipal();
         final User user = iUserService.getUserByName(name);
         user.setNickname(nickname);
+        user.setUpdateTime(LocalDateTime.now());
         iUserService.updateById(user);
         response.setStatus(HttpStatus.OK.value());
     }
@@ -116,6 +131,7 @@ public class UserController {
         final User user = iUserService.getUserByName(name);
         if (oldpsw.equals(user.getPassword())){
             user.setPassword(newpsw);
+            user.setUpdateTime(LocalDateTime.now());
             iUserService.updateById(user);
             response.setStatus(HttpStatus.OK.value());
         } else {
@@ -131,10 +147,31 @@ public class UserController {
     public void updatePasswordById(@PathVariable String userid, @PathVariable String newpsw,
                                    HttpServletResponse response){
         final User user = iUserService.getById(userid);
+        if (user == null){
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+        }
         user.setPassword(newpsw);
+        user.setUpdateTime(LocalDateTime.now());
         iUserService.updateById(user);
         response.setStatus(HttpStatus.OK.value());
 
+    }
+
+    /**
+     * 删除 用户
+     */
+    @RequiresRoles({"admin"})
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable String id,
+                           HttpServletResponse response){
+        final User user = iUserService.getById(id);
+        if (user == null){
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+        }
+        iUserService.removeById(id);
+        response.setStatus(HttpStatus.OK.value());
     }
 
     // login 与 logout 重复

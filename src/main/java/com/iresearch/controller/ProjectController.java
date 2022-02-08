@@ -50,23 +50,37 @@ public class ProjectController {
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @GetMapping
     public List<ProjectVO> getProjects(HttpServletResponse response){
+        return getProjectsSearch("", response);
+    }
+    /**
+     * 查询项目 (Shiro PathVariable 中文)
+     * @param response response
+     */
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
+    @GetMapping("/name")
+    public List<ProjectVO> getProjectsSearch(String name,
+                                             HttpServletResponse response){
+
         // 权限判断
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
         final String userTypeString = iUserService.getUserTypeStringByName(username);
 
         final List<Project> projects;
+
+        LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(Project::getName,name);
         // 用户只能获取自己的 项目
         if (RoleEnum.USER.value().equals(userTypeString)){
             final User user = iUserService.getUserByName(username);
-            LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(Project::getCreateId,user.getId());
             projects = iProjectService.list(wrapper);
 
         } else {
-            projects = iProjectService.list();
+            projects = iProjectService.list(wrapper);
         }
         if(projects == null || projects.size() == 0){
-            response.setStatus(HttpStatus.NOT_FOUND.value());
+            //  暂不返回 404 错误
+            // response.setStatus(HttpStatus.NOT_FOUND.value());
         } else {
             response.setStatus(HttpStatus.OK.value());
             return iProjectService.projectList2ProjectVOList(projects);
@@ -80,7 +94,7 @@ public class ProjectController {
      * @return Project
      */
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ProjectVO getProjectById( @PathVariable Integer id,HttpServletResponse response){
         final Project project = iProjectService.getById(id);
         if (project == null){

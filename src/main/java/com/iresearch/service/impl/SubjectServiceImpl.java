@@ -31,6 +31,7 @@ public class SubjectServiceImpl extends ServiceImpl<SubjectMapper, Subject> impl
         SubjectVO subjectVO = new SubjectVO();
         subjectVO.setId(subject.getId());
         subjectVO.setName(subject.getName());
+        subjectVO.setCollegeId(subject.getCollegeId());
 
         return subjectVO;
     }

@@ -10,23 +10,23 @@
         <div class="container">
             <div class="handle-box">
                 <el-input v-model="query.name" placeholder="项目名称" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="Search">搜索</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
                 <el-table-column prop="name" label="项目名称"></el-table-column>
 
-                <el-table-column prop="address" label="项目类型"></el-table-column>
-                <el-table-column prop="address" label="所属学院"></el-table-column>
+                <el-table-column prop="projectTypeName" label="项目类型"></el-table-column>
+                <el-table-column prop="subjectName" label="学科名称"></el-table-column>
                 <el-table-column label="状态" align="center">
                     <template #default="scope">
                         <el-tag :type="
-                                scope.row.state === '成功'
+                                scope.row.statusName.endsWith('成功')
                                     ? 'success'
-                                    : scope.row.state === '失败'
-                                    ? 'danger'
-                                    : ''
-                            ">{{ scope.row.state }}</el-tag>
+                                    : scope.row.statusName.endsWith('中')
+                                    ? 'warning'
+                                    : 'danger'
+                            ">{{ scope.row.statusName }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="380" align="center">
@@ -52,48 +52,46 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-model="editVisible" width="60%" top="3vh">
-            <el-form ref="formRef" :rules="rules" :model="form" label-width="80px">
+                <el-form ref="formRef" :rules="rules" :model="form" label-width="80px">
                     <el-form-item label="项目名称" prop="name">
                         <el-input v-model="form.name"></el-input>
                     </el-form-item>
-                    <el-form-item label="负责人" prop="name">
-                        <el-input v-model="form.name"></el-input>
+                    <el-form-item label="负责人" prop="inCharge">
+                        <el-input v-model="form.inCharge"></el-input>
                     </el-form-item>
-                    <el-form-item label="项目类型" prop="region">
-                        <el-select v-model="form.region" placeholder="请选择">
-                            <el-option key="bbk" label="步步高" value="bbk"></el-option>
-                            <el-option key="xtc" label="小天才" value="xtc"></el-option>
-                            <el-option key="imoo" label="imoo" value="imoo"></el-option>
+                    <el-form-item label="项目类型" prop="type">
+                        <el-select v-model="form.type" placeholder="请选择">
+                            <el-option key="1" label="研究" value="1"></el-option>
+                            <el-option key="2" label="设计" value="2"></el-option>
                         </el-select>
                     </el-form-item>
 
                     <el-form-item label="学科" prop="options">
-                        <el-cascader :options="options" v-model="form.options"></el-cascader>
+                        <el-cascader :options="options" v-model="form.options"  style="width:400px"></el-cascader>
                     </el-form-item>
 
-                    <el-form-item label="预期结果" prop="desc">
-                        <el-input type="textarea" rows="2" v-model="form.desc"></el-input>
+                    <el-form-item label="立项目的" prop="projectPurpose">
+                        <el-input type="textarea" rows="2" v-model="form.projectPurpose"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="立项目的" prop="desc">
-                        <el-input type="textarea" rows="2" v-model="form.desc"></el-input>
+                    <el-form-item label="可行分析" prop="viableAnalysis">
+                        <el-input type="textarea" rows="2" v-model="form.viableAnalysis"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="现有条件" prop="desc">
-                        <el-input type="textarea" rows="2" v-model="form.desc"></el-input>
+                    <el-form-item label="效益分析" prop="economicAnalysis">
+                        <el-input type="textarea" rows="2" v-model="form.economicAnalysis"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="方案分析" prop="desc">
-                        <el-input type="textarea" rows="2" v-model="form.desc"></el-input>
+                    <el-form-item label="现有条件" prop="existingConditions">
+                        <el-input type="textarea" rows="2" v-model="form.existingConditions"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="效益分析" prop="desc">
-                        <el-input type="textarea" rows="2" v-model="form.desc"></el-input>
+                    <el-form-item label="预期结果" prop="expectedResult">
+                        <el-input type="textarea" rows="2" v-model="form.expectedResult"></el-input>
                     </el-form-item>
 
                     <el-form-item>
                         <el-button type="primary" @click="onSubmit">提交</el-button>
-                        <el-button @click="editVisible = false">取 消</el-button>
                     </el-form-item>
                 </el-form>
         </el-dialog>
@@ -103,37 +101,56 @@
 <script>
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { fetchData } from "../api/index";
+import axios from 'axios'
 
 export default {
     name: "basetable",
+
+    mounted(){
+        // 总数
+        axios.get("/api" + "/iresearch/project").then((response)=>{
+                this.tableData = response.data;
+                // console.log(this.tableData);
+            }).catch((error)=>{
+                console.log(error);
+        })
+        // 获取 科目
+        axios.get("/api" + "/iresearch/college").then((response=>{
+            let data = response.data;
+            // console.log(data);
+            data = data.map(o=>{return{value:o.id, label:o.name,children:o.subjects}});
+            data.forEach(element => {
+                element.children = element.children.map(o=>{return{value:o.id, label:o.name}});
+            });
+            this.options = data
+            this.form.options = data
+        })).catch((error)=>{
+            console.log(error);
+        })
+    },
     setup() {
         const query = reactive({
-            address: "",
             name: "",
-            pageIndex: 1,
-            pageSize: 10,
         });
         const tableData = ref([]);
         const pageTotal = ref(0);
-        // 获取表格数据
-        const getData = () => {
-            fetchData(query).then((res) => {
-                tableData.value = res.list;
-                pageTotal.value = res.pageTotal || 50;
-            });
-        };
-        getData();
 
-        // 查询操作
-        const handleSearch = () => {
-            query.pageIndex = 1;
-            getData();
+        const options = [];
+        const rules = {
+            name: [{ required: true, message: "请输入项目名称", trigger: "blur" }],
+            inCharge: [{ required: true, message: "请输入主管名称", trigger: "blur" }],
+            type: [{ required: true, message: "请选择类型", trigger: "blur" }],
+            options: [{ required: true, message: "请选择学科", trigger: "blur" }],
+            projectPurpose: [{ required: true, message: "请输入立项目的", trigger: "blur" }],
+            economicAnalysis: [{ required: true, message: "请输入效益分析", trigger: "blur" }],
+            existingConditions: [{ required: true, message: "请输入现有条件", trigger: "blur" }],
+            expectedResult: [{ required: true, message: "请输入预期结果", trigger: "blur" }],
+            viableAnalysis: [{ required: true, message: "请输入可行分析", trigger: "blur" }],
         };
+
         // 分页导航
         const handlePageChange = (val) => {
             query.pageIndex = val;
-            getData();
         };
 
         // 删除操作
@@ -151,43 +168,105 @@ export default {
 
         // 表格编辑时弹窗和保存
         const editVisible = ref(false);
-        let form = reactive({
+        const form = reactive({
+            id :"",
             name: "",
-            address: "",
+            inCharge: "",
+            type: "",
+            // 控制 前端 的suject 保存在 options中
+            subject: "",
+            projectPurpose: "",
+            economicAnalysis:"",
+            existingConditions:"",
+            expectedResult:"",
+            viableAnalysis:"",
+            options: [],
         });
-        let idx = -1;
         const handleEdit = (index, row) => {
-            idx = index;
+            //  row 为 post 请求后 tableData中的数据
+            //  form 为前端显示 和 提交表单 的数据 
+        
+            // 将对象 映射到 表单
             Object.keys(form).forEach((item) => {
                 form[item] = row[item];
             });
+            // select 转换
+            form.type = row.projectTypeName == "设计"? '2' : "1"
+            // 学科转换
+            axios.get("/api" + "/iresearch/subject").then((response)=>{
+                let data = response.data
+                // 不支持 for each ?? 貌似 与 类型有关
+                for (const key in data) {
+                    if (Object.hasOwnProperty.call(data, key)) {
+                        const element = data[key];
+                        if(element.name == row.subjectName){
+                            form.options = [element.collegeId,element.id]
+                        }
+                    }
+                }
+
+            }).catch((error)=>{
+                console.log(error)
+            })
+            console.log(form);
             editVisible.value = true;
         };
-        const saveEdit = () => {
-            editVisible.value = false;
-            ElMessage.success(`修改第 ${idx + 1} 行成功`);
-            Object.keys(form).forEach((item) => {
-                tableData.value[idx][item] = form[item];
-            });
+        // 修改项目
+        const onSubmit = () => {
+            let url = "/api" + "/iresearch/project/" + form.id + "?name=" + form.name +"&inCharge=" + form.inCharge + "&type=" + 
+            form.type + "&subject=" + form.options[1] + "&projectPurpose=" + form.projectPurpose + "&economicAnalysis=" +
+            form.economicAnalysis + "&existingConditions=" + form.existingConditions + "&expectedResult=" + 
+            form.expectedResult + "&viableAnalysis=" + form.viableAnalysis;
+            axios.put(url).then((response)=>{
+                if(response.status == "200"){
+                    ElMessage.success("修改成功");
+                    location.reload();
+                } else {
+                    throw false;
+                }
+            }).catch((error)=>{
+                console.log(error);
+                ElMessage.error("修改失败");
+            })
         };
+        // 申报项目
+
+        // 非 管理员 显示
+         
+        // 通过项目 
+        // 驳回项目
 
         return {
+            options,
+            rules,
             query,
             tableData,
             pageTotal,
             editVisible,
             form,
-            handleSearch,
             handlePageChange,
             handleDelete,
             handleEdit,
-            saveEdit,
-        };
+            onSubmit,
+        }
     },
+    methods:{
+        // setup 似乎 无法 与前端实现 双向绑定 。
+        // 搜索
+        Search(){
+            axios.get("/api" + "/iresearch/project/name?name=" + this.query.name).then((response=>{
+                let data = response.data;
+                // console.log(data);
+                this.tableData = data;
+            })).catch((error)=>{
+                console.log(error);
+            })   
+        },
+    }
 };
 </script>
 
-<style scoped>
+<style scoped>  
 .handle-box {
     margin-bottom: 20px;
 }

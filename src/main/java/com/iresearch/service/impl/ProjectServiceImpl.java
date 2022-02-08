@@ -44,6 +44,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Resource
     FileMapper fileMapper;
 
+    @Resource
+    ProjectStatusMapper statusMapper;
+
     @Override
     public boolean updateProjectStatus(Integer id, Integer status) {
         final Project project = projectMapper.selectById(id);
@@ -68,6 +71,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         projectVO.setId(project.getId());
         projectVO.setName(project.getName());
 
+
+        // 可能 为空 （前端 与 数据库 部分 设置了 not null，部分判断 多余）
         if (project.getCollegeId()!=null){
             final Integer collegeId = project.getCollegeId();
             final College college = collegeMapper.selectById(collegeId);
@@ -95,6 +100,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             final File file = fileMapper.selectById(fileId);
             projectVO.setFileName(file.getFile());
         }
+
+        // 获取状态名称
+        final Integer status = project.getProjectStatus();
+        final ProjectStatus projectStatus = statusMapper.selectById(status);
+        projectVO.setStatusName(projectStatus.getProjectStatus());
 
         projectVO.setProjectPurpose(project.getProjectPurpose());
         projectVO.setEconomicAnalysis(project.getEconomicAnalysis());

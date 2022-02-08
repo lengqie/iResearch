@@ -33,6 +33,8 @@ public class ProjectVO implements Serializable  {
 
     private String projectTypeName;
 
+    private String statusName;
+
     private String fileName;
 
     private String projectPurpose;

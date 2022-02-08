@@ -16,5 +16,4 @@ import java.io.Serializable;
 public class SubjectVO implements Serializable {
     private Integer id;
     private String name;
-    private CollegeVO collegeVO;
 }

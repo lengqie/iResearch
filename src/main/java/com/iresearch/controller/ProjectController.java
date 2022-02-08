@@ -136,13 +136,13 @@ public class ProjectController {
      */
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @PostMapping
-    public void addProject(String name, Integer college, Integer subject,String inCharge, Integer type,
+    public void addProject(String name, Integer subject,String inCharge, Integer type,
                            String projectPurpose,String economicAnalysis, String existingConditions,
                            String expectedResult, String viableAnalysis,
                            HttpServletResponse response){
 
         Project project = new Project();
-        projectSetter(name, college, subject, inCharge, type, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
+        projectSetter(name, subject, inCharge, type, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
                 project);
         // 获取当前用户id
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
@@ -162,6 +162,7 @@ public class ProjectController {
         // 操作记录
         Operation operation =new Operation();
         operation.setUserId(userId);
+        operation.setProjectId(project.getId());
         operation.setOperation(ProjectEnum.CREATED.explain());
         operation.setCreateTime(LocalDateTime.now());
         iOperationService.save(operation);
@@ -207,7 +208,7 @@ public class ProjectController {
     @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
     @PutMapping("/{id}")
     public void updateProjectById(@PathVariable Integer id,
-                                  String name, Integer college, Integer subject,String inCharge, Integer type,
+                                  String name, Integer subject,String inCharge, Integer type,
                                   String projectPurpose,String economicAnalysis, String existingConditions,
                                   String expectedResult, String viableAnalysis,
                                   HttpServletResponse response){
@@ -226,7 +227,7 @@ public class ProjectController {
             return;
         }
         // 修改项目
-        projectSetter(name, college, subject, inCharge, type, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
+        projectSetter(name, subject, inCharge, type, projectPurpose, economicAnalysis, existingConditions, expectedResult, viableAnalysis,
                 project);
         project.setUpdateTime(LocalDateTime.now());
         // 保存数据库
@@ -313,9 +314,8 @@ public class ProjectController {
     /**
      * 简化代码
      */
-    private void projectSetter(String name, int college, int subject, String inCharge, int type, String projectPurpose, String economicAnalysis, String existingConditions, String expectedResult, String viableAnalysis, @NotNull Project project) {
+    private void projectSetter(String name, int subject, String inCharge, int type, String projectPurpose, String economicAnalysis, String existingConditions, String expectedResult, String viableAnalysis, @NotNull Project project) {
         project.setName(name);
-        project.setCollegeId(college);
         project.setSubjectId(subject);
         project.setInCharge(inCharge);
         project.setProjectType(type);

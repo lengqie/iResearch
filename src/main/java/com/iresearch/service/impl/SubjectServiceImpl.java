@@ -25,26 +25,13 @@ import java.util.List;
 @Service
 public class SubjectServiceImpl extends ServiceImpl<SubjectMapper, Subject> implements ISubjectService {
 
-    @Resource
-    SubjectMapper subjectMapper;
-
-    @Resource
-    CollegeMapper collegeMapper;
 
     @Override
     public SubjectVO subject2SubjectVO(Subject subject) {
         SubjectVO subjectVO = new SubjectVO();
-
         subjectVO.setId(subject.getId());
         subjectVO.setName(subject.getName());
 
-        final Integer collegeId = subject.getCollegeId();
-        final College college = collegeMapper.selectById(collegeId);
-        CollegeVO collegeVO = new CollegeVO();
-        collegeVO.setId(college.getId());
-        collegeVO.setName(college.getName());
-
-        subjectVO.setCollegeVO(collegeVO);
         return subjectVO;
     }
 

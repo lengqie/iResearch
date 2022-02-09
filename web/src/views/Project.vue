@@ -33,14 +33,10 @@
                     <template #default="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
                         </el-button>
-                        <el-button type="text" icon="el-icon-top" @click="handleEdit(scope.$index, scope.row)">申报
+                        <el-button type="text" icon="el-icon-top" @click="handleApply(scope.$index, scope.row)">申报
                         </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
-                            @click="handleDelete(scope.$index, scope.row)">删除&nbsp&nbsp</el-button>
-                        <div class="sudo">
-                            <el-button type="text" icon="el-icon-check" @click="handleEdit(scope.$index, scope.row)">通过</el-button>
-                            <el-button type="text" icon="el-icon-back" class="red" @click="handleEdit(scope.$index, scope.row)">驳回</el-button>
-                        </div>
+                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -108,12 +104,19 @@ export default {
 
     mounted(){
         // 总数
-        axios.get("/api" + "/iresearch/project").then((response)=>{
-                this.tableData = response.data;
-                // console.log(this.tableData);
-            }).catch((error)=>{
-                console.log(error);
-        })
+        // 无法抽离出 公共函数 ??? 
+        [0].forEach(status => {
+            axios.get("/api" + "/iresearch/project/status/" + status).then((response)=>{
+                    let data = response.data;
+                    data.forEach(element => {
+                        this.tableData.push(element)
+                    });                    
+                    // console.log(this.tableData);
+                }).catch((error)=>{
+                    console.log(error);
+            })
+        });
+
         // 获取 科目
         axios.get("/api" + "/iresearch/college").then((response=>{
             let data = response.data;
@@ -151,19 +154,6 @@ export default {
         // 分页导航
         const handlePageChange = (val) => {
             query.pageIndex = val;
-        };
-
-        // 删除操作
-        const handleDelete = (index) => {
-            // 二次确认删除
-            ElMessageBox.confirm("确定要删除吗？", "提示", {
-                type: "warning",
-            })
-                .then(() => {
-                    ElMessage.success("删除成功");
-                    tableData.value.splice(index, 1);
-                })
-                .catch(() => {});
         };
 
         // 表格编辑时弹窗和保存
@@ -229,12 +219,51 @@ export default {
                 ElMessage.error("修改失败");
             })
         };
-        // 申报项目
 
+
+        // 修改 状态的 push (公共函数 )
+        const PutStatus = (index ,id, newStatus,msg) => {
+            axios.put("/api" + "/iresearch/project/" + id + "/status/" + newStatus).then((response)=>{
+                if(response.status == "200"){
+                    ElMessage.success(msg + "成功");
+                    tableData.value.splice(index, 1);
+                } else {
+                    throw false;
+                }
+            }).catch((error)=>{
+                console.log(error);
+                ElMessage.error(msg + "失败");
+            })
+        }
+
+        // 申报项目
+        const handleApply = (index, row) => {
+            // console.log(row);
+            PutStatus(index,row.id,1,"申报")
+        }
+        // 删除
+        const handleDelete = (index,row) => {
+            // 二次确认删除
+            ElMessageBox.confirm("确定要删除吗？", "提示", {
+                type: "warning",
+            }).then(() => {
+                    PutStatus(index,row.id,-1,"删除")
+                })
+                .catch(() => {});
+        };
         // 非 管理员 显示
-         
-        // 通过项目 
+        const role = localStorage.getItem('user_type')
+        const isRole = role == "admin" ? true : false 
+        // 通过项目
+        const handlePass = (index, row) => {
+            // console.log(row);
+            PutStatus(index,row.id,2,"通过")
+        }
         // 驳回项目
+        const handleUnpass = (index, row) => {
+            // console.log(row);
+            PutStatus(index,row.id,-2,"驳回")
+        }
 
         return {
             options,
@@ -248,13 +277,17 @@ export default {
             handleDelete,
             handleEdit,
             onSubmit,
+            handleApply,
+            isRole,
+            handlePass,
+            handleUnpass,
         }
     },
     methods:{
         // setup 似乎 无法 与前端实现 双向绑定 。
         // 搜索
         Search(){
-            axios.get("/api" + "/iresearch/project/name?name=" + this.query.name).then((response=>{
+            axios.get("/api" + "/iresearch/project/status/0/name?name=" + this.query.name).then((response=>{
                 let data = response.data;
                 // console.log(data);
                 this.tableData = data;

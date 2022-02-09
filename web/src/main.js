@@ -5,7 +5,6 @@ import store from './store'
 import installElementPlus from './plugins/element'
 import './assets/css/icon.css'
 
-import './global.js'
 import axios from 'axios'
 
 // 请求

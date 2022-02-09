@@ -107,7 +107,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title} | iResearch - 科研管理系统`;
-    const role = localStorage.getItem('ms_username');
+    const role = localStorage.getItem('user_type');
     if (!role && to.path !== '/login') {
         next('/login');
     } else if (to.meta.permission) {

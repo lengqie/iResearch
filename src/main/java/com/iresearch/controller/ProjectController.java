@@ -81,6 +81,7 @@ public class ProjectController {
         if(projects == null || projects.size() == 0){
             //  暂不返回 404 错误
             // response.setStatus(HttpStatus.NOT_FOUND.value());
+            response.setStatus(HttpStatus.OK.value());
         } else {
             response.setStatus(HttpStatus.OK.value());
             return iProjectService.projectList2ProjectVOList(projects);
@@ -121,6 +122,17 @@ public class ProjectController {
     @GetMapping("/status/{status}")
     public List<ProjectVO> getProjectsByStatus(@PathVariable Integer status,
                                              HttpServletResponse response){
+        return getProjectsByStatusSearch(status, "", response);
+
+    }
+
+    /**
+     * 通过状态 查询 项目
+     */
+    @RequiresRoles(value = {"user","admin"},logical = Logical.OR)
+    @GetMapping("/status/{status}/name")
+    public List<ProjectVO> getProjectsByStatusSearch(@PathVariable Integer status, String name,
+                                                     HttpServletResponse response){
 
         final String username = (String) SecurityUtils.getSubject().getPrincipal();
         final String userTypeString = iUserService.getUserTypeStringByName(username);
@@ -129,6 +141,7 @@ public class ProjectController {
         // 用户只能获取自己的 项目
         LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Project::getProjectStatus,status);
+        wrapper.like(Project::getName,name);
 
         if (RoleEnum.USER.value().equals(userTypeString)){
             final User user = iUserService.getUserByName(username);
@@ -137,7 +150,9 @@ public class ProjectController {
 
         projects = iProjectService.list(wrapper);
         if(projects == null || projects.size() == 0){
-            response.setStatus(HttpStatus.NOT_FOUND.value());
+            //  暂不返回 404 错误
+            // response.setStatus(HttpStatus.NOT_FOUND.value());
+            response.setStatus(HttpStatus.OK.value());
         } else {
             response.setStatus(HttpStatus.OK.value());
             return iProjectService.projectList2ProjectVOList(projects);

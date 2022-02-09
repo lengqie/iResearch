@@ -31,10 +31,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="380" align="center">
                     <template #default="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
-                        </el-button>
-                        <el-button type="text" icon="el-icon-top" @click="handleApply(scope.$index, scope.row)">申报
-                        </el-button>
+                        <el-button type="text" icon="el-icon-files" @click="See(scope.$index, scope.row)">查看</el-button>
+                        <el-button type="text" icon="el-icon-edit" @click="Edit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button type="text" icon="el-icon-top" @click="handleApply(scope.$index, scope.row)">申报</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
                             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
@@ -86,7 +85,7 @@
                         <el-input type="textarea" rows="2" v-model="form.expectedResult"></el-input>
                     </el-form-item>
 
-                    <el-form-item>
+                    <el-form-item v-show="isSee">
                         <el-button type="primary" @click="onSubmit">提交</el-button>
                     </el-form-item>
                 </el-form>
@@ -100,7 +99,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import axios from 'axios'
 
 export default {
-    name: "basetable",
+    name: "project",
 
     mounted(){
         // 总数
@@ -198,7 +197,6 @@ export default {
             }).catch((error)=>{
                 console.log(error)
             })
-            console.log(form);
             editVisible.value = true;
         };
         // 修改项目
@@ -219,8 +217,6 @@ export default {
                 ElMessage.error("修改失败");
             })
         };
-
-
         // 修改 状态的 push (公共函数 )
         const PutStatus = (index ,id, newStatus,msg) => {
             axios.put("/api" + "/iresearch/project/" + id + "/status/" + newStatus).then((response)=>{
@@ -235,7 +231,6 @@ export default {
                 ElMessage.error(msg + "失败");
             })
         }
-
         // 申报项目
         const handleApply = (index, row) => {
             // console.log(row);
@@ -264,7 +259,9 @@ export default {
             // console.log(row);
             PutStatus(index,row.id,-2,"驳回")
         }
-
+        // 用来区分 查看 与 编辑
+        // 但是 setup无法 双向绑定 ？？ 方法写在 methods
+        let isSee = ref(true)
         return {
             options,
             rules,
@@ -281,6 +278,7 @@ export default {
             isRole,
             handlePass,
             handleUnpass,
+            isSee,
         }
     },
     methods:{
@@ -294,6 +292,15 @@ export default {
             })).catch((error)=>{
                 console.log(error);
             })   
+        },
+        // 判断 查看 还是 编辑 
+        Edit(index, row){
+            this.isSee = true
+            this.handleEdit(index,row)
+        },
+        See(index, row){
+            this.isSee = false
+            this.handleEdit(index,row)
         },
     }
 };

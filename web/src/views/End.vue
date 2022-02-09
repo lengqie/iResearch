@@ -31,7 +31,8 @@
                 </el-table-column>
                 <el-table-column label="操作" width="380" align="center">
                     <template #default="scope">
-                        <el-button type="text" icon="el-icon-edit" v-show="scope.row.statusName.endsWith('失败')" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button type="text" icon="el-icon-files" @click="See(scope.$index, scope.row)">查看</el-button>
+                        <el-button type="text" icon="el-icon-edit" v-show="scope.row.statusName.endsWith('失败')" @click="Edit(scope.$index, scope.row)">编辑</el-button>
                         <el-button type="text" icon="el-icon-lock"  v-show="scope.row.statusName.endsWith('失败')" @click="handleEnd(scope.$index, scope.row)">结课</el-button>
                         <div class="sudo" v-show="isRole && (scope.row.statusName.endsWith('中'))">
                             <el-button type="text" icon="el-icon-check" @click="handlePass(scope.$index, scope.row)">通过</el-button>
@@ -84,9 +85,8 @@
 
                     <el-form-item label="预期结果" prop="expectedResult">
                         <el-input type="textarea" rows="2" v-model="form.expectedResult"></el-input>
-                    </el-form-item>
-
-                    <el-form-item>
+                    </el-form-item> 
+                    <el-form-item v-show="isSee">
                         <el-button type="primary" @click="onSubmit">提交</el-button>
                     </el-form-item>
                 </el-form>
@@ -229,7 +229,7 @@ export default {
         const handleEnd = (index, row) => {
             PutStatus(index,row.id,3,"结课申请")
         }
-
+        let isSee = ref(true)
         return {
             options,
             rules,
@@ -245,6 +245,7 @@ export default {
             handlePass,
             handleUnpass,
             handleEnd,
+            isSee,
         }
     },
     methods:{
@@ -260,6 +261,14 @@ export default {
                     console.log(error);
                 })   
             });
+        },
+        Edit(index, row){
+            this.isSee = true
+            this.handleEdit(index,row)
+        },
+        See(index, row){
+            this.isSee = false
+            this.handleEdit(index,row)
         },
     }
 };

@@ -239,7 +239,7 @@ export default {
         // 申报项目
         const handleApply = (index, row) => {
             // console.log(row);
-            PutStatus(index,row.id,1,"申报")
+            PutStatus(index,row.id,1,"申报申请")
         }
         // 删除
         const handleDelete = (index,row) => {

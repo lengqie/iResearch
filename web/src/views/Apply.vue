@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 项目管理
+                    <i class="el-icon-lx-cascades"></i> 申报管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -31,13 +31,10 @@
                 </el-table-column>
                 <el-table-column label="操作" width="380" align="center">
                     <template #default="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
-                        </el-button>
-                        <el-button type="text" icon="el-icon-top" @click="handleApply(scope.$index, scope.row)">申报
-                        </el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red"
-                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                        <div class="sudo" v-show="isRole">
+                        <el-button type="text" icon="el-icon-edit" v-show="scope.row.statusName.endsWith('失败')" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button type="text" icon="el-icon-top"  v-show="scope.row.statusName.endsWith('失败')" @click="handleApply(scope.$index, scope.row)">申报</el-button>
+                        <el-button type="text" icon="el-icon-lock"  v-show="scope.row.statusName.endsWith('成功')" @click="handleEnd(scope.$index, scope.row)">结课</el-button>
+                        <div class="sudo" v-show="isRole && (scope.row.statusName.endsWith('中'))">
                             <el-button type="text" icon="el-icon-check" @click="handlePass(scope.$index, scope.row)">通过</el-button>
                             <el-button type="text" icon="el-icon-back" class="red" @click="handleUnpass(scope.$index, scope.row)">驳回</el-button>
                         </div>
@@ -109,7 +106,7 @@ export default {
     mounted(){
         // 总数
         // 无法抽离出 公共函数 ??? 
-        [0].forEach(status => {
+        [1,2,-2].forEach(status => {
             axios.get("/api" + "/iresearch/project/status/" + status).then((response)=>{
                     let data = response.data;
                     data.forEach(element => {
@@ -230,7 +227,9 @@ export default {
             axios.put("/api" + "/iresearch/project/" + id + "/status/" + newStatus).then((response)=>{
                 if(response.status == "200"){
                     ElMessage.success(msg + "成功");
-                    tableData.value.splice(index, 1);
+                    // tableData.value.splice(index, 1);
+                    // 干脆 直接 刷新 
+                    location.reload()
                 } else {
                     throw false;
                 }
@@ -243,18 +242,8 @@ export default {
         // 申报项目
         const handleApply = (index, row) => {
             // console.log(row);
-            PutStatus(index,row.id,1,"申报")
+            PutStatus(index,row.id,1,"申报申请")
         }
-        // 删除
-        const handleDelete = (index,row) => {
-            // 二次确认删除
-            ElMessageBox.confirm("确定要删除吗？", "提示", {
-                type: "warning",
-            }).then(() => {
-                    PutStatus(index,row.id,-1,"删除")
-                })
-                .catch(() => {});
-        };
         // 非 管理员 显示
         const role = localStorage.getItem('user_type')
         const isRole = role == "admin" ? true : false 
@@ -268,6 +257,11 @@ export default {
             // console.log(row);
             PutStatus(index,row.id,-2,"驳回")
         }
+        // 驳回项目
+        const handleEnd = (index, row) => {
+            // console.log(row);
+            PutStatus(index,row.id,3,"结课申请")
+        }
 
         return {
             options,
@@ -278,13 +272,13 @@ export default {
             editVisible,
             form,
             handlePageChange,
-            handleDelete,
             handleEdit,
             onSubmit,
             handleApply,
             isRole,
             handlePass,
             handleUnpass,
+            handleEnd,
         }
     },
     methods:{

@@ -303,11 +303,6 @@ export default {
 .handle-box {
     margin-bottom: 20px;
 }
-
-.handle-select {
-    width: 120px;
-}
-
 .handle-input {
     width: 300px;
     display: inline-block;
@@ -321,11 +316,5 @@ export default {
 }
 .mr10 {
     margin-right: 10px;
-}
-.table-td-thumb {
-    display: block;
-    margin: auto;
-    width: 40px;
-    height: 40px;
 }
 </style>

@@ -100,27 +100,21 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import axios from 'axios'
 
 export default {
-    name: "basetable",
-
+    name: "end",
+    // 代码冗余 过多， 注释 信息 与 Apply.vue Project.vue 相同
     mounted(){
-        // 总数
-        // 无法抽离出 公共函数 ??? 
         [3,4,-4].forEach(status => {
             axios.get("/api" + "/iresearch/project/status/" + status).then((response)=>{
                     let data = response.data;
                     data.forEach(element => {
                         this.tableData.push(element)
                     });                    
-                    // console.log(this.tableData);
                 }).catch((error)=>{
                     console.log(error);
             })
         });
-
-        // 获取 科目
         axios.get("/api" + "/iresearch/college").then((response=>{
             let data = response.data;
-            // console.log(data);
             data = data.map(o=>{return{value:o.id, label:o.name,children:o.subjects}});
             data.forEach(element => {
                 element.children = element.children.map(o=>{return{value:o.id, label:o.name}});
@@ -150,20 +144,15 @@ export default {
             expectedResult: [{ required: true, message: "请输入预期结果", trigger: "blur" }],
             viableAnalysis: [{ required: true, message: "请输入可行分析", trigger: "blur" }],
         };
-
-        // 分页导航
         const handlePageChange = (val) => {
             query.pageIndex = val;
         };
-
-        // 表格编辑时弹窗和保存
         const editVisible = ref(false);
         const form = reactive({
             id :"",
             name: "",
             inCharge: "",
             type: "",
-            // 控制 前端 的suject 保存在 options中
             subject: "",
             projectPurpose: "",
             economicAnalysis:"",
@@ -173,19 +162,12 @@ export default {
             options: [],
         });
         const handleEdit = (index, row) => {
-            //  row 为 post 请求后 tableData中的数据
-            //  form 为前端显示 和 提交表单 的数据 
-        
-            // 将对象 映射到 表单
             Object.keys(form).forEach((item) => {
                 form[item] = row[item];
             });
-            // select 转换
             form.type = row.projectTypeName == "设计"? '2' : "1"
-            // 学科转换
             axios.get("/api" + "/iresearch/subject").then((response)=>{
                 let data = response.data
-                // 不支持 for each ?? 貌似 与 类型有关
                 for (const key in data) {
                     if (Object.hasOwnProperty.call(data, key)) {
                         const element = data[key];
@@ -220,14 +202,10 @@ export default {
             })
         };
 
-
-        // 修改 状态的 push (公共函数 )
         const PutStatus = (index ,id, newStatus,msg) => {
             axios.put("/api" + "/iresearch/project/" + id + "/status/" + newStatus).then((response)=>{
                 if(response.status == "200"){
                     ElMessage.success(msg + "成功");
-                    // tableData.value.splice(index, 1);
-                    // 干脆 直接 刷新 
                     location.reload()
                 } else {
                     throw false;
@@ -238,22 +216,17 @@ export default {
             })
         }
 
-        // 非 管理员 显示
         const role = localStorage.getItem('user_type')
         const isRole = role == "admin" ? true : false 
-        // 通过项目
+
         const handlePass = (index, row) => {
-            // console.log(row);
             PutStatus(index,row.id,4,"通过")
         }
-        // 驳回项目
         const handleUnpass = (index, row) => {
-            // console.log(row);
             PutStatus(index,row.id,-4,"驳回")
         }
-        // 驳回项目
+        // 结课
         const handleEnd = (index, row) => {
-            // console.log(row);
             PutStatus(index,row.id,3,"结课申请")
         }
 
@@ -275,16 +248,18 @@ export default {
         }
     },
     methods:{
-        // setup 似乎 无法 与前端实现 双向绑定 。
-        // 搜索
         Search(){
-            axios.get("/api" + "/iresearch/project/status/0/name?name=" + this.query.name).then((response=>{
-                let data = response.data;
-                // console.log(data);
-                this.tableData = data;
-            })).catch((error)=>{
-                console.log(error);
-            })   
+            [3,4,-4].forEach(status => {
+                this.tableData = []
+                axios.get("/api" + "/iresearch/project/status/"+ status +"/name?name=" + this.query.name).then((response=>{
+                    let data = response.data;
+                    data.forEach(element => {
+                        this.tableData.push(element)
+                    });  
+                })).catch((error)=>{
+                    console.log(error);
+                })   
+            });
         },
     }
 };
@@ -294,11 +269,6 @@ export default {
 .handle-box {
     margin-bottom: 20px;
 }
-
-.handle-select {
-    width: 120px;
-}
-
 .handle-input {
     width: 300px;
     display: inline-block;
@@ -312,11 +282,5 @@ export default {
 }
 .mr10 {
     margin-right: 10px;
-}
-.table-td-thumb {
-    display: block;
-    margin: auto;
-    width: 40px;
-    height: 40px;
 }
 </style>

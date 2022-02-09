@@ -31,13 +31,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="380" align="center">
                     <template #default="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
-                        </el-button>
-                        <el-button type="text" icon="el-icon-top" @click="handleApply(scope.$index, scope.row)">申报
-                        </el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red"
-                            @click="handleDelete(scope.$index, scope.row)">删除&nbsp&nbsp</el-button>
-                        <div class="sudo" v-show="isRole">
+                        <el-button type="text" icon="el-icon-edit" v-show="scope.row.statusName.endsWith('失败')" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button type="text" icon="el-icon-lock"  v-show="scope.row.statusName.endsWith('失败')" @click="handleEnd(scope.$index, scope.row)">结课</el-button>
+                        <div class="sudo" v-show="isRole && (scope.row.statusName.endsWith('中'))">
                             <el-button type="text" icon="el-icon-check" @click="handlePass(scope.$index, scope.row)">通过</el-button>
                             <el-button type="text" icon="el-icon-back" class="red" @click="handleUnpass(scope.$index, scope.row)">驳回</el-button>
                         </div>
@@ -108,12 +104,19 @@ export default {
 
     mounted(){
         // 总数
-        axios.get("/api" + "/iresearch/project/status/0").then((response)=>{
-                this.tableData = response.data;
-                // console.log(this.tableData);
-            }).catch((error)=>{
-                console.log(error);
-        })
+        // 无法抽离出 公共函数 ??? 
+        [3,4,-4].forEach(status => {
+            axios.get("/api" + "/iresearch/project/status/" + status).then((response)=>{
+                    let data = response.data;
+                    data.forEach(element => {
+                        this.tableData.push(element)
+                    });                    
+                    // console.log(this.tableData);
+                }).catch((error)=>{
+                    console.log(error);
+            })
+        });
+
         // 获取 科目
         axios.get("/api" + "/iresearch/college").then((response=>{
             let data = response.data;
@@ -218,12 +221,14 @@ export default {
         };
 
 
-        // 修改 状态的 push
+        // 修改 状态的 push (公共函数 )
         const PutStatus = (index ,id, newStatus,msg) => {
             axios.put("/api" + "/iresearch/project/" + id + "/status/" + newStatus).then((response)=>{
                 if(response.status == "200"){
                     ElMessage.success(msg + "成功");
-                    tableData.value.splice(index, 1);
+                    // tableData.value.splice(index, 1);
+                    // 干脆 直接 刷新 
+                    location.reload()
                 } else {
                     throw false;
                 }
@@ -233,33 +238,23 @@ export default {
             })
         }
 
-        // 申报项目
-        const handleApply = (index, row) => {
-            // console.log(row);
-            PutStatus(index,row.id,1,"申报")
-        }
-        // 删除
-        const handleDelete = (index,row) => {
-            // 二次确认删除
-            ElMessageBox.confirm("确定要删除吗？", "提示", {
-                type: "warning",
-            }).then(() => {
-                    PutStatus(index,row.id,-1,"删除")
-                })
-                .catch(() => {});
-        };
         // 非 管理员 显示
         const role = localStorage.getItem('user_type')
         const isRole = role == "admin" ? true : false 
         // 通过项目
         const handlePass = (index, row) => {
             // console.log(row);
-            PutStatus(index,row.id,2,"通过")
+            PutStatus(index,row.id,4,"通过")
         }
         // 驳回项目
         const handleUnpass = (index, row) => {
             // console.log(row);
-            PutStatus(index,row.id,-2,"驳回")
+            PutStatus(index,row.id,-4,"驳回")
+        }
+        // 驳回项目
+        const handleEnd = (index, row) => {
+            // console.log(row);
+            PutStatus(index,row.id,3,"结课申请")
         }
 
         return {
@@ -271,13 +266,12 @@ export default {
             editVisible,
             form,
             handlePageChange,
-            handleDelete,
             handleEdit,
             onSubmit,
-            handleApply,
             isRole,
             handlePass,
             handleUnpass,
+            handleEnd,
         }
     },
     methods:{

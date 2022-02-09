@@ -257,7 +257,7 @@ export default {
             // console.log(row);
             PutStatus(index,row.id,-2,"驳回")
         }
-        // 驳回项目
+        // 结课项目
         const handleEnd = (index, row) => {
             // console.log(row);
             PutStatus(index,row.id,3,"结课申请")

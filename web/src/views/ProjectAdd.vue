@@ -23,31 +23,24 @@
                             <el-option key="2" label="设计" value="2"></el-option>
                         </el-select>
                     </el-form-item>
-
                     <el-form-item label="学科" prop="options">
                         <el-cascader :options="options" v-model="form.options"  style="width:400px"></el-cascader>
                     </el-form-item>
-
                     <el-form-item label="立项目的" prop="projectPurpose">
                         <el-input type="textarea" rows="2" v-model="form.projectPurpose"></el-input>
                     </el-form-item>
-
                     <el-form-item label="可行分析" prop="viableAnalysis">
                         <el-input type="textarea" rows="2" v-model="form.viableAnalysis"></el-input>
                     </el-form-item>
-
                     <el-form-item label="效益分析" prop="economicAnalysis">
                         <el-input type="textarea" rows="2" v-model="form.economicAnalysis"></el-input>
                     </el-form-item>
-
                     <el-form-item label="现有条件" prop="existingConditions">
                         <el-input type="textarea" rows="2" v-model="form.existingConditions"></el-input>
                     </el-form-item>
-
                     <el-form-item label="预期结果" prop="expectedResult">
                         <el-input type="textarea" rows="2" v-model="form.expectedResult"></el-input>
                     </el-form-item>
-
                     <el-form-item>
                         <el-button type="primary" @click="onSubmit">表单提交</el-button>
                         <el-button @click="onReset">重置表单</el-button>
@@ -62,7 +55,6 @@
 import { reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import axios from 'axios'
-
 
 export default {
     name: "projectadd",
@@ -80,8 +72,6 @@ export default {
         })).catch((error)=>{
             console.log(error);
         })
-        // 获取类型
-
     },
     setup() {
         const options = [];
@@ -133,7 +123,6 @@ export default {
         const onReset = () => {
             formRef.value.resetFields();
         };
-
         return {
             options,
             rules,

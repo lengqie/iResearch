@@ -37,7 +37,6 @@
                 <el-table-column label="昵称">
                     <template #default="scope">{{ scope.row.nickname }}</template>
                 </el-table-column>
-
                 <el-table-column prop="date" label="注册时间"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template #default="scope">
@@ -53,7 +52,6 @@
                     :page-size="query.pageSize" :total="pageTotal" @current-change="handlePageChange"></el-pagination>
             </div>
         </div>
-
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-model="editVisible" width="30%">
             <el-form label-width="70px">
@@ -147,13 +145,11 @@ export default {
             name: "",
             password: "",
         });
-
         // 分页导航
         const handlePageChange = (val) => {
             query.pageIndex = val;
             getData();
         };
-
         // 删除操作
         const handleDelete = (index,row) => {
             // 二次确认删除
@@ -175,7 +171,6 @@ export default {
                     ElMessage.error("删除失败");
                 });
         };
-
         // 表格编辑时弹窗和保存
         const editVisible = ref(false);
         let form = reactive({
@@ -224,11 +219,6 @@ export default {
 .handle-box {
     margin-bottom: 20px;
 }
-
-.handle-select {
-    width: 120px;
-}
-
 .handle-input {
     width: 300px;
     display: inline-block;
@@ -242,11 +232,5 @@ export default {
 }
 .mr10 {
     margin-right: 10px;
-}
-.table-td-thumb {
-    display: block;
-    margin: auto;
-    width: 40px;
-    height: 40px;
 }
 </style>

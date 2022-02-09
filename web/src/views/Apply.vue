@@ -15,7 +15,6 @@
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
                 <el-table-column prop="name" label="项目名称"></el-table-column>
-
                 <el-table-column prop="projectTypeName" label="项目类型"></el-table-column>
                 <el-table-column prop="subjectName" label="学科名称"></el-table-column>
                 <el-table-column label="状态" align="center">
@@ -47,7 +46,6 @@
                     :page-size="query.pageSize" :total="pageTotal" @current-change="handlePageChange"></el-pagination>
             </div>
         </div>
-
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-model="editVisible" width="60%" top="3vh">
                 <el-form ref="formRef" :rules="rules" :model="form" label-width="80px">
@@ -63,31 +61,24 @@
                             <el-option key="2" label="设计" value="2"></el-option>
                         </el-select>
                     </el-form-item>
-
                     <el-form-item label="学科" prop="options">
                         <el-cascader :options="options" v-model="form.options"  style="width:400px"></el-cascader>
                     </el-form-item>
-
                     <el-form-item label="立项目的" prop="projectPurpose">
                         <el-input type="textarea" rows="2" v-model="form.projectPurpose"></el-input>
                     </el-form-item>
-
                     <el-form-item label="可行分析" prop="viableAnalysis">
                         <el-input type="textarea" rows="2" v-model="form.viableAnalysis"></el-input>
                     </el-form-item>
-
                     <el-form-item label="效益分析" prop="economicAnalysis">
                         <el-input type="textarea" rows="2" v-model="form.economicAnalysis"></el-input>
                     </el-form-item>
-
                     <el-form-item label="现有条件" prop="existingConditions">
                         <el-input type="textarea" rows="2" v-model="form.existingConditions"></el-input>
                     </el-form-item>
-
                     <el-form-item label="预期结果" prop="expectedResult">
                         <el-input type="textarea" rows="2" v-model="form.expectedResult"></el-input>
                     </el-form-item>
-
                     <el-form-item v-show="isSee">
                         <el-button type="primary" @click="onSubmit">提交</el-button>
                     </el-form-item>
@@ -103,7 +94,7 @@ import axios from 'axios'
 
 export default {
     name: "apply",
-    // 代码冗余 过多， 注释 信息 与 Apply.vue Project.vue 相同
+    // 代码冗余 过多， 注释 信息 与 End.vue Project.vue 相同
     mounted(){
         [1,2,-2].forEach(status => {
             axios.get("/api" + "/iresearch/project/status/" + status).then((response)=>{
@@ -133,7 +124,6 @@ export default {
         });
         const tableData = ref([]);
         const pageTotal = ref(0);
-
         const options = [];
         const rules = {
             name: [{ required: true, message: "请输入项目名称", trigger: "blur" }],
@@ -200,7 +190,6 @@ export default {
                 ElMessage.error("修改失败");
             })
         };
-
         const PutStatus = (index ,id, newStatus,msg) => {
             axios.put("/api" + "/iresearch/project/" + id + "/status/" + newStatus).then((response)=>{
                 if(response.status == "200"){
@@ -216,7 +205,6 @@ export default {
                 ElMessage.error(msg + "失败");
             })
         }
-
         const handleApply = (index, row) => {
             PutStatus(index,row.id,1,"申报申请")
         }

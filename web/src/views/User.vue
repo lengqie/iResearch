@@ -53,10 +53,8 @@ import axios from 'axios'
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 
-
 export default {
     name: "user",
-
     setup() {
         const name = localStorage.getItem("ms_username");
         const router = useRouter();
@@ -104,12 +102,10 @@ export default {
                         ElMessage.error("修改失败");
                         return false;
                     })
-            }
+                }
             }
         };
-
         const avatarImg = ref(avatar);
-
         return {
             name,
             form,
@@ -139,23 +135,6 @@ export default {
     width: 100%;
     height: 100%;
 }
-.info-edit {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-.info-edit i {
-    color: #eee;
-    font-size: 25px;
-}
 .info-image:hover .info-edit {
     opacity: 1;
 }
@@ -164,17 +143,5 @@ export default {
     font-size: 24px;
     font-weight: 500;
     color: #262626;
-}
-.crop-demo-btn {
-    position: relative;
-}
-.crop-input {
-    position: absolute;
-    width: 100px;
-    height: 40px;
-    left: 0;
-    top: 0;
-    opacity: 0;
-    cursor: pointer;
 }
 </style>

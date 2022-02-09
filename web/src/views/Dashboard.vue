@@ -23,7 +23,6 @@
                             </div>
                         </el-card>
                     </el-col>
-                    
                     <el-col :span="24" style="margin-bottom: 10px;">
                         <el-card shadow="hover" :body-style="{ padding: '0px' }">
                             <div class="grid-content grid-con-2">
@@ -35,7 +34,6 @@
                             </div>
                         </el-card>
                     </el-col>
-                    
                     <el-col :span="24" style="margin-bottom: 10px;">
                         <el-card shadow="hover" :body-style="{ padding: '0px' }">
                             <div class="grid-content grid-con-3">
@@ -56,7 +54,6 @@
                             <span>待办</span>
                         </div>
                     </template>
-
                 <el-table :data="pendingList" style="width: 100%">
                     <el-table-column prop="title" label="项目名称" width="800px" />
                     <el-table-column
@@ -86,7 +83,6 @@ import axios from 'axios'
 
 export default {
     name: "dashboard",
-
     mounted(){
         // 总数
         axios.get("/api" + "/iresearch/project").then((response)=>{
@@ -131,11 +127,9 @@ export default {
     setup() {
         const name = localStorage.getItem("ms_username");
         const role = localStorage.getItem("user_type") === "admin" ? "超级管理员" : "普通用户";
-
         let project = ref(0);
         let pending = ref(0);
         let end = ref(0);
-
         const pendingList = reactive([]);
 
         return {
@@ -151,28 +145,21 @@ export default {
 </script>
 
 <style scoped>
-.el-row {
-    margin-bottom: 20px;
-}
-
 .grid-content {
     display: flex;
     align-items: center;
     height: 100px;
 }
-
 .grid-cont-right {
     flex: 1;
     text-align: center;
     font-size: 14px;
     color: #999;
 }
-
 .grid-num {
     font-size: 30px;
     font-weight: bold;
 }
-
 .grid-con-icon {
     font-size: 50px;
     width: 100px;
@@ -205,7 +192,6 @@ export default {
 .grid-con-3 .grid-num {
     color: rgb(242, 94, 67);
 }
-
 .user-info {
     display: flex;
     align-items: center;
@@ -213,13 +199,6 @@ export default {
     border-bottom: 2px solid #ccc;
     margin-bottom: 20px;
 }
-
-.user-avator {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-}
-
 .user-info-cont {
     padding-left: 50px;
     flex: 1;
@@ -231,32 +210,7 @@ export default {
     font-size: 30px;
     color: #222;
 }
-
-.user-info-list {
-    font-size: 14px;
-    color: #999;
-    line-height: 25px;
-}
-
-.user-info-list span {
-    margin-left: 70px;
-}
-
 .mgb20 {
     margin-bottom: 20px;
-}
-
-.todo-item {
-    font-size: 14px;
-}
-
-.todo-item-del {
-    text-decoration: line-through;
-    color: #999;
-}
-
-.schart {
-    width: 100%;
-    height: 300px;
 }
 </style>

@@ -55,7 +55,7 @@
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-model="editVisible" width="30%">
             <el-form label-width="70px">
-                <el-form-item label="用户名："> 张三 </el-form-item>
+                <!-- <el-form-item label="用户名："> 张三 </el-form-item> -->
                 <el-form-item label="密码">
                     <el-input v-model="form.newpassword"></el-input>
                 </el-form-item>

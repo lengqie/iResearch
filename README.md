@@ -121,7 +121,7 @@ git clone https://github.com/lengqie/iResearch.git
 
 IDEA 打开导入依赖后直接运行
 
-(Swaggwer：[http://127.0.0.1:8081/swagger-ui/](http://127.0.0.1:8080/swagger-ui/))
+(Swaggwer：[http://127.0.0.1:8080/swagger-ui/](http://127.0.0.1:8080/swagger-ui/))
 
 ### 2.2 前端
 

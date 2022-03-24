@@ -318,7 +318,8 @@ public class ProjectController {
             final boolean case1 = ProjectEnum.CREATED.value().equals(projectStatus) && ProjectEnum.APPLYING.value().equals(status);
             // 2. project 状态为 apply 修改 为 ending
             final boolean case2 = ProjectEnum.APPLY.value().equals(projectStatus) && ProjectEnum.ENDING.value().equals(status);
-            if (!case1 || !case2){
+            // 两种情况都不满足 时 则 抛出异常
+            if (!case1 && !case2){
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
